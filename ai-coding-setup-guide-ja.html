@@ -534,13 +534,13 @@
         <p class="label reveal">Intro</p>
         <h2 class="reveal">なぜこのガイドを作ったのか</h2>
         <p class="reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem); line-height:1.8;">
-            Garry Tan（Y-Combinator CEO）が公開した<strong>gstack</strong>を使ってみたところ、自分の仕事のスタイルにぴったりのハーネスだった。企画からレビュー、QA、デプロイ、振り返りまで。まるでY-Combinator時代の素早く動く初期スタートアップのような感覚を、AIハーネスで実現した感じだった。
+            Garry Tan（Y-Combinator CEO）が公開した<strong>gstack</strong>を使ってみたところ、企画からレビュー、QA、デプロイ、振り返りに至るまで、自分の仕事のスタイルに非常によく合うハーネスだと感じました。まるでY-Combinator時代の素早く動く初期スタートアップのような感覚を、AIハーネスで実現できると感じました。
         </p>
         <p class="reveal" style="margin-top:clamp(0.4rem,0.8vw,0.6rem); line-height:1.8;">
-            そこで、AIコーディング環境をゼロから完全に再構築することにした。bkit、superpower、oh my codex、oh my claude codeなど数多くのハーネスをテストしてきた結果、ローカル環境には不要なファイルも多く、一度整理する必要があると感じた。
+            そこで、AIコーディング環境をゼロから完全に再構築することにしました。bkit、superpower、oh my codex、oh my claude codeなど数多くのハーネスをテストしてきた結果、ローカル環境には不要なファイルも多く、一度整理する必要があると判断しました。
         </p>
         <div class="highlight-box reveal" style="margin-top:clamp(0.6rem,1vw,1rem);">
-            <p>そして、どうせやり直すなら、一度整理しておけば初めての人の助けになるだろうと思い、このドキュメントを作成した。</p>
+            <p>そして、せっかくやり直すのであれば、一度整理しておくことで初めての方の助けになると考え、このドキュメントを作成しました。</p>
         </div>
     </div>
 </section>
@@ -554,7 +554,7 @@
     <div class="slide-content" style="align-items:center; text-align:center;">
         <p class="label reveal" style="color:var(--accent-light);">Section 01</p>
         <h1 class="reveal" style="color:#fff;">既存環境の<br>完全削除</h1>
-        <p class="subtitle reveal" style="color:rgba(255,255,255,0.5); margin-top:0.8rem;">既存の設定をすべてクリーンにしてから始める。</p>
+        <p class="subtitle reveal" style="color:rgba(255,255,255,0.5); margin-top:0.8rem;">既存の設定をすべて整理し、クリーンな状態にしてから始めます。</p>
     </div>
     <div class="section-number section-number-dark">01</div>
 </section>
@@ -609,7 +609,7 @@
             <code><span class="kw">rm</span> -rf ~/.agents</code>
         </div>
         <div class="highlight-box reveal" style="margin-top:clamp(0.8rem,1.5vw,1.2rem);">
-            <p>これで完全なクリーン状態に戻った。</p>
+            <p>これで完全なクリーン状態に戻りました。</p>
         </div>
     </div>
 </section>
@@ -642,7 +642,7 @@
 <span class="kw">rtk</span> init --global</code>
         </div>
         <div class="highlight-box reveal" style="margin-top:clamp(0.6rem,1vw,1rem);">
-            <p><strong>RTK</strong>はLLMトークンパターンを分析してトークン使用量を<strong>60～90%</strong>まで削減するLLM Proxy。Claude Codeのコストを大幅に節約できる。</p>
+            <p><strong>RTK</strong>はLLMトークンパターンを分析し、トークン使用量を<strong>60～90%</strong>まで削減するLLM Proxyです。Claude Codeのコストを節約できます。</p>
         </div>
     </div>
 </section>
@@ -660,7 +660,7 @@
             <code><span class="kw">brew</span> install --cask codex</code>
         </div>
         <div class="highlight-box reveal" style="margin-top:clamp(0.6rem,1vw,1rem);">
-            <p>&#9888;&#65039; npmでインストールすると、miseでローカルnode環境を使う際にプロジェクトごとにPATHが変わる問題が発生する。<strong>brewでインストールすること。</strong></p>
+            <p>&#9888;&#65039; npmでインストールすると、miseでローカルnode環境を使う際にプロジェクトごとにPATHが変わる問題が発生します。<strong>brewでインストールしてください。</strong></p>
         </div>
     </div>
 </section>
@@ -739,10 +739,10 @@
     <div class="slide-content">
         <p class="label reveal">3-3</p>
         <h2 class="reveal">① コンテキストエンジニアリング — AIに何を伝えるか</h2>
-        <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">新入社員に説明なしで「働け」と言っても無理です。AIも同じです。</p>
+        <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">新入社員に何の説明もなく「働け」と言っても対応できません。AIも同じです。</p>
         <ul class="bullets reveal" style="margin-top:clamp(0.4rem,0.8vw,0.6rem);">
-            <li>プロジェクトルール、コーディング規約、作業状況… これらを<strong>CLAUDE.md、AGENTS.md</strong>などの文書で整理して渡す必要があります</li>
-            <li>エージェントが読めない情報は<strong>存在しないのと同じ</strong>です</li>
+            <li>プロジェクトルール、コーディング規約、作業状況… これらを<strong>CLAUDE.md、AGENTS.md</strong>などの文書で整理して渡す必要があります。</li>
+            <li>エージェントが読めない情報は<strong>存在しないのと同じ</strong>です。</li>
             <li>Cognition（Devinチーム）: 「コンテキストエンジニアリングは事実上、AIエージェントを構築するエンジニアの最優先業務だ」</li>
         </ul>
         <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem); font-size:var(--small-size); color:var(--text-tertiary);">Anthropic: 「長時間実行エージェントは、以前何があったか記憶なしに新しいセッションを開始する。引き継ぎ文書なしで交代勤務するエンジニアと同じだ。」</p>
@@ -759,7 +759,7 @@
         <h2 class="reveal">② アーキテクチャ制約 — AIがやってはいけないことを決める</h2>
         <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">ボウリングのバンパーのように、自由を与えると迷走し、境界を設けるとむしろ早く正解に辿り着きます。</p>
         <ul class="bullets reveal" style="margin-top:clamp(0.4rem,0.8vw,0.6rem);">
-            <li>逆説的ですが、<strong>制約が生産性を高めます</strong></li>
+            <li>逆説的ですが、<strong>制約が生産性を高めます</strong>。</li>
             <li>Mitchell Hashimoto（HashiCorp創業者）: 「エージェントがミスをするたびに、そのミスを二度とできないようハーネスに解決策を追加せよ」</li>
             <li>OpenAI Codexチーム: 依存性フロー、レイヤー分離、カスタムリンターを制約として設定し、エージェントの信頼性を劇的に向上</li>
             <li>KarpathyのCLAUDE.mdがまさにこのアプローチ — 「どうコーディングするか」ではなく<strong>「やるべきでないこと」</strong>を明確にしたもの</li>
@@ -824,10 +824,10 @@
         <h2 class="reveal">問題: 両方を同じスキルで管理したい</h2>
         <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">Claude Code EnterpriseとCodex Enterpriseの両方を使用しているため、ハーネスを変更したら両方に適用する必要があります。これを簡単にするために一元管理が必要です。</p>
         <ul class="bullets reveal" style="margin-top:clamp(0.4rem,0.8vw,0.6rem);">
-            <li>Claude Code: <code>/plugin</code>でインストール → <code>~/.claude/plugins/cache</code>に保存、System Promptに自動注入</li>
-            <li><code>/plugin</code>でインストールすると<code>/skills</code>には表示されず、<code>/context</code>で確認可能</li>
+            <li>Claude Codeでは<code>/plugin</code>でインストールすると、<code>~/.claude/plugins/cache</code>に保存され、System Promptに自動で注入されます。</li>
+            <li><code>/plugin</code>でインストールすると<code>/skills</code>には表示されず、<code>/context</code>で確認できます。</li>
             <li>自動更新という利点はあるが...</li>
-            <li><strong>CodexにはまだMarketplaceがない</strong> → 両方の管理問題が発生</li>
+            <li><strong>CodexにはまだMarketplaceがないため</strong>、両方の管理上の課題が発生します。</li>
         </ul>
     </div>
 </section>
@@ -861,8 +861,16 @@
         <ul class="bullets reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
             <li>SkillDeckはMacで綺麗なGUIによる直感的な管理が可能だが、</li>
             <li>ターミナル操作に慣れているので<strong>skills.sh</strong>を採用</li>
-            <li><code>npx skills check</code>、<code>npx skills update</code>で最新バージョンを維持</li>
+            <li>以下のコマンドで、スキルの状態と最新バージョンを簡単に確認できます。</li>
         </ul>
+        <div class="code-block reveal" style="position:relative; margin-top:clamp(0.4rem,0.8vw,0.6rem);">
+            <span class="code-lang">bash</span>
+            <code>npx skills check
+npx skills update</code>
+        </div>
+        <div class="reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <img src="images/skills-sh.png" alt="skills.sh page preview" style="max-width:100%; border-radius:8px; box-shadow:0 2px 12px rgba(0,0,0,0.10);">
+        </div>
     </div>
 </section>
 
@@ -874,7 +882,7 @@
     <div class="slide-content">
         <p class="label reveal">4-3b</p>
         <h2 class="reveal">なぜgstackをハーネスに選んだのか</h2>
-        <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">すでにsuperpowers、bkit、omxなど色々試してきたが、<strong>gstack</strong>が自分のスタイルに一番合っていると感じたので、今回はgstackをメインハーネスとして使うことにした。gstackの詳細については後編でさらに詳しく取り上げる。</p>
+        <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">すでにsuperpowers、bkit、omxなどを試してきましたが、<strong>gstack</strong>が自分のスタイルに最も合っていると判断したため、今回はgstackをメインハーネスとして使うことにしました。gstackの詳細については後編でさらに詳しく取り上げます。</p>
         <table class="slide-table reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
             <tr><th>ツール</th><th>強み</th><th>弱み</th></tr>
 
@@ -939,7 +947,7 @@ npx skills add https://github.com/obra/superpowers --skill <span class="str">usi
         <h2 class="reveal">インストール時のオプション: Global + Symbolic Link</h2>
         <ul class="bullets reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
             <li><code>~/.agents/skills</code>にgit clone → <code>~/.claude/skills</code>にシンボリックリンク</li>
-            <li>新バージョンが出たら両方（Claude Code & Codex）に同時反映</li>
+            <li>新バージョンが出た際には両方（Claude Code & Codex）に同時反映</li>
             <li>Codexは<code>~/.agents/skills</code>を自動参照するため別途リンク不要</li>
         </ul>
         <div class="highlight-box reveal" style="margin-top:clamp(0.6rem,1vw,1rem);">
@@ -991,7 +999,7 @@ npx skills add https://github.com/obra/superpowers --skill <span class="str">usi
         <div class="highlight-box reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
             <p>「AIコーディングエージェントをチャット型アシスタントではなく、<strong>役割が分離された仮想開発チーム</strong>のように運用するためのスキルパック + 超高速ブラウザ自動化ツール」</p>
         </div>
-        <p class="reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">核心は新しいモデルではなく、<strong>開発プロセスを強く構造化する</strong>という点。</p>
+        <p class="reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">核心は新しいモデルではなく、<strong>開発プロセスを強く構造化する</strong>という点です。</p>
         <p class="reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem); font-size:var(--small-size); color:var(--text-tertiary);">GitHub: <a href="https://github.com/garrytan/gstack" target="_blank" style="color:var(--accent-light); text-decoration:none;">github.com/garrytan/gstack</a></p>
     </div>
 </section>
@@ -1099,7 +1107,7 @@ npx skills add https://github.com/obra/superpowers --skill <span class="str">usi
             <span class="flow-item">/retro</span>
         </div>
         <div class="highlight-box reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
-            <p>gstackは「コマンド集」ではなく、事実上<strong>スプリント運用規約</strong>である。「実装専用」スキルはなく、プランレビュー後にClaude Codeへ直接実装を指示する。</p>
+            <p>gstackは「コマンド集」ではなく、事実上<strong>スプリント運用規約</strong>です。「実装専用」のスキルはなく、プランレビュー後にClaude Codeへ直接実装を指示します。</p>
         </div>
     </div>
 </section>
@@ -1360,11 +1368,11 @@ $B responsive /tmp/layout</code>
         <p class="label reveal">5-18</p>
         <h2 class="reveal">制限事項と注意点</h2>
         <ul class="bullets reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
-            <li><strong>強くopinionated</strong> — Garry Tan式の開発文化と合わなければ窮屈に感じることがある</li>
-            <li>コアロジックの大部分がprompt/skill markdown → 「エンジン」より「運用ルール」の比重が大きい</li>
+            <li><strong>強くopinionated</strong> — Garry Tan式の開発文化と合わない場合は、窮屈に感じることがあります。</li>
+            <li>コアロジックの大部分がprompt/skill markdownにあるため、「エンジン」より「運用ルール」の比重が大きくなります。</li>
             <li>Cookie復号化は<strong>macOS Keychain中心</strong>（Windows/Linux未実装）</li>
             <li><strong>iframeサポートなし</strong>（most-requested missing feature）</li>
-            <li>非Claudeホストでは/carefulなどがadvisory proseとして弱くなる</li>
+            <li>非Claudeホストでは、<code>/careful</code>などの強制力がadvisory proseレベルまで弱まることがあります。</li>
             <li>telemetryはopt-inだが存在 — スキル名、時間、結果、バージョン、OSを収集</li>
         </ul>
     </div>
@@ -1379,7 +1387,7 @@ $B responsive /tmp/layout</code>
         <p class="label reveal">5-19</p>
         <h2 class="reveal">gstack 結論</h2>
         <div class="highlight-box reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
-            <p>gstackは「AIがより賢くなるツール」ではなく<strong>「AIをチームのように運用する方式」</strong>である。</p>
+            <p>gstackは「AIがより賢くなるツール」ではなく、<strong>「AIをチームのように運用する方式」</strong>です。</p>
         </div>
         <ul class="bullets reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
             <li>最大の改善はモデルではなく<strong>運用構造</strong></li>
@@ -1418,7 +1426,7 @@ $B responsive /tmp/layout</code>
             <li>Gstack指示を追加</li>
             <li>サブエージェントモード指示を追加</li>
             <li>RTK指示（<code>@RTK.md</code>参照）を追加</li>
-            <li>RTKは現在Claude Codeでのみ動作するため、RTK.mdを除けば<code>~/.codex/AGENTS.md</code>も同一構成で問題ありません</li>
+            <li>RTKは現在Claude Codeでのみ動作するため、RTK.mdを除けば<code>~/.codex/AGENTS.md</code>も同一構成で問題ありません。</li>
         </ul>
     </div>
 </section>
@@ -1432,7 +1440,7 @@ $B responsive /tmp/layout</code>
         <p class="label reveal">6-1+</p>
         <h2 class="reveal">KarpathyのCLAUDE.mdはなぜ話題になったのか</h2>
         <ul class="bullets reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
-            <li><strong>たった4つの原則</strong>でAIコーディングエージェントの慢性的な問題（過剰設計、不要なリファクタリング、推測的なコード）を正面から狙い撃ち</li>
+            <li><strong>たった4つの原則</strong>でAIコーディングエージェントの慢性的な問題（過剰設計、不要なリファクタリング、推測的なコード）に正面から向き合っています。</li>
             <li>「シニアエンジニアが見て複雑すぎると言うか？ならシンプルに書き直せ」— この一文が開発者コミュニティで爆発的に拡散</li>
             <li>長く冗長だった従来のCLAUDE.mdに比べ、<strong>短く具体的な行動指針</strong>だけで実際のコード品質が目に見えて向上</li>
             <li>AIに「どうコーディングするか」ではなく<strong>「やるべきでないこと」</strong>を明確にした逆転の発想が核心</li>
@@ -1744,7 +1752,7 @@ The main context → orchestrator only. Implementation → subagents.
     <div class="slide-content">
         <p class="label reveal">Step 5</p>
         <h2 class="reveal">実装 — Ralphループで自動化</h2>
-        <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">gstackの領域を超えて<strong>Ralph</strong>が登場。プランが確定したので実装をRalphループに任せる。</p>
+        <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">ここからはgstackの領域を超えて、<strong>Ralph</strong>を活用します。プランが確定したため、実装はRalphループに任せます。</p>
         <div class="code-block reveal" style="position:relative; margin-top:clamp(0.4rem,0.8vw,0.6rem);">
             <code>/ralph-loop <span class="str">"
 Phase 1: プロジェクト初期化 (Next.js + Prisma)
@@ -1888,7 +1896,7 @@ Phase 4: テスト (Vitest + Playwright, カバレッジ80%+)
             <span class="flow-item">/retro</span>
         </div>
         <div class="highlight-box reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
-            <p><strong>gstack</strong>がプロセスの骨格、<strong>Ralph</strong>が自動反復ループ。一人開発者がチームレベルの品質ゲートを維持しながら実装を自動化する核心的な組み合わせ。</p>
+            <p><strong>gstack</strong>はプロセスの骨格を担い、<strong>Ralph</strong>は自動反復ループを担当します。これは、一人開発者がチームレベルの品質ゲートを維持しながら実装を自動化できるようにする中核的な組み合わせです。</p>
         </div>
     </div>
 </section>
@@ -1936,11 +1944,11 @@ Phase 4: テスト (Vitest + Playwright, カバレッジ80%+)
         <p class="label reveal">A.2</p>
         <h2 class="reveal">核心設計哲学</h2>
         <div class="highlight-box reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
-            <p><strong>Command</strong>がフローをオーケストレーションし、<strong>Agent</strong>が独立して作業し、<strong>Skill</strong>が知識/手順を再利用し、<strong>Hook</strong>が外部から自動化を掛ける。</p>
+            <p><strong>Command</strong>がフローをオーケストレーションし、<strong>Agent</strong>が独立して作業し、<strong>Skill</strong>が知識/手順を再利用し、<strong>Hook</strong>が外部から自動化を実行します。</p>
         </div>
         <ul class="bullets reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
-            <li>一緒に見るべきルートファイル: <code>CLAUDE.md</code> + <code>.mcp.json</code></li>
-            <li><code>.claude</code>だけ見ると半分しか見えない</li>
+            <li>一緒に確認すべきルートファイル: <code>CLAUDE.md</code> + <code>.mcp.json</code></li>
+            <li><code>.claude</code>だけでは全体の半分しか把握できません</li>
         </ul>
     </div>
 </section>
@@ -1953,15 +1961,15 @@ Phase 4: テスト (Vitest + Playwright, カバレッジ80%+)
     <div class="slide-content">
         <p class="label reveal">A.3</p>
         <h2 class="reveal">commands/ — ワークフローコントローラ</h2>
-        <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">複雑な作業を一つのagentに詰め込まない:</p>
+        <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">複雑な作業を一つのagentに詰め込みません:</p>
         <ol class="reveal" style="padding-left:1.5em; margin-top:clamp(0.3rem,0.6vw,0.5rem); list-style:decimal;">
-            <li><strong>Command</strong>がフローを定義</li>
-            <li><strong>Agent</strong>が独立作業を処理</li>
-            <li><strong>Skill</strong>が再利用可能な手順を担当</li>
+            <li><strong>Command</strong>がフローを定義します。</li>
+            <li><strong>Agent</strong>が独立作業を処理します。</li>
+            <li><strong>Skill</strong>が再利用可能な手順を担当します。</li>
         </ol>
         <ul class="bullets reveal" style="margin-top:clamp(0.4rem,0.8vw,0.6rem);">
-            <li>フローが見え、ユーザー確認ステップを入れやすい</li>
-            <li>一つの役割が肥大化せず、再利用しやすくなる</li>
+            <li>フローが見え、ユーザー確認ステップを入れやすくなります。</li>
+            <li>一つの役割が肥大化せず、再利用しやすくなります。</li>
         </ul>
     </div>
 </section>
@@ -1974,7 +1982,7 @@ Phase 4: テスト (Vitest + Playwright, カバレッジ80%+)
     <div class="slide-content">
         <p class="label reveal">A.4</p>
         <h2 class="reveal">agents/ — 役割ベースのワーカー</h2>
-        <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">「fresh isolated context」を持つ独立アクター。</p>
+        <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">「fresh isolated context」を持つ独立アクターです。</p>
         <table class="slide-table reveal" style="margin-top:clamp(0.4rem,0.8vw,0.6rem);">
             <tr><th>フィールド</th><th>説明</th></tr>
             <tr><td><code>name</code> / <code>description</code></td><td>識別子 / いつ使うべきか</td></tr>
@@ -1983,7 +1991,7 @@ Phase 4: テスト (Vitest + Playwright, カバレッジ80%+)
             <tr><td><code>memory</code> / <code>isolation</code></td><td>user・project・local / worktree</td></tr>
         </table>
         <div class="highlight-box reveal" style="margin-top:clamp(0.4rem,0.8vw,0.6rem);">
-            <p>大きな万能agent一つよりも、<strong>小さな役割専用agentを複数持つ方が良い。</strong></p>
+            <p>大きな万能agent一つよりも、<strong>小さな役割専用agentを複数持つ方が適しています。</strong></p>
         </div>
     </div>
 </section>
@@ -1999,15 +2007,15 @@ Phase 4: テスト (Vitest + Playwright, カバレッジ80%+)
         <div class="two-col reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
             <div>
                 <h3 style="font-size:var(--body-size); margin-bottom:0.3rem;">A. 直接呼び出し</h3>
-                <p>commandまたはユーザーによって呼び出し。現在のコンテキストで動作。共通手順の再利用に最適。</p>
+                <p>commandまたはユーザーによって呼び出されます。現在のコンテキストで動作し、共通手順の再利用に適しています。</p>
             </div>
             <div>
                 <h3 style="font-size:var(--body-size); margin-bottom:0.3rem;">B. Agent preload</h3>
-                <p>agentの<code>skills:</code>に入れて開始時に注入。「このagentが知っておくべき作業知識」。<code>user-invocable: false</code>でメニュー非表示が可能。</p>
+                <p>agentの<code>skills:</code>に入れて開始時に注入します。「このagentが把握しておくべき作業知識」です。<code>user-invocable: false</code>でメニューを非表示にできます。</p>
             </div>
         </div>
         <div class="highlight-box reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
-            <p>descriptionは初期コンテキストに入り、全内容は呼び出し時のみロード。長い説明は<strong>context budget</strong>を消費するだけ。</p>
+            <p>descriptionは初期コンテキストに入り、全内容は呼び出し時のみロードされます。長い説明は<strong>context budget</strong>を消費するだけです。</p>
         </div>
     </div>
 </section>
@@ -2214,11 +2222,11 @@ Phase 4: テスト (Vitest + Playwright, カバレッジ80%+)
         <p class="label reveal">A.16</p>
         <h2 class="reveal">最も実用的な結論</h2>
         <ol class="reveal" style="padding-left:1.5em; margin-top:clamp(0.5rem,1vw,0.8rem); list-style:decimal;">
-            <li><code>.claude</code>は単なる設定フォルダではなく<strong>Claude Code運用レイヤー</strong>である。</li>
-            <li>command、agent、skillは代替物ではなく<strong>役割が異なる構成要素</strong>である。</li>
+            <li><code>.claude</code>は単なる設定フォルダではなく<strong>Claude Code運用レイヤー</strong>です。</li>
+            <li>command、agent、skillは代替物ではなく<strong>役割が異なる構成要素</strong>です。</li>
             <li>良いセットアップ = 短いメモリ + モジュール化されたrules + 再利用skills + 制限されたagents + event-driven hooks</li>
-            <li><strong>チーム共有資産と個人資産を分離</strong>しないと長続きしない。</li>
-            <li><strong>context budgetと権限管理を構造で解決</strong>しないと安定的に動作しない。</li>
+            <li><strong>チーム共有資産と個人資産を分離</strong>しなければ長続きしません。</li>
+            <li><strong>context budgetと権限管理を構造で解決</strong>しなければ安定的に動作しません。</li>
         </ol>
     </div>
 </section>
