@@ -2,9 +2,9 @@
 
 > **Claude Code + Codex + gstack + Ralph** — everything you need to turn AI coding agents into a structured virtual dev team.
 
-**[Read the Guide](https://ai-coding-guide-with-gstack.vercel.app)**
+**<a href="https://ai-coding-guide-with-gstack.vercel.app" target="_blank">Read the Guide</a>**
 
-[Korean](https://ai-coding-guide-with-gstack.vercel.app/ai-coding-setup-guide-ko.html) | [English](https://ai-coding-guide-with-gstack.vercel.app/ai-coding-setup-guide-en.html) | [Japanese](https://ai-coding-guide-with-gstack.vercel.app/ai-coding-setup-guide-ja.html)
+<a href="https://ai-coding-guide-with-gstack.vercel.app/ai-coding-setup-guide-ko.html" target="_blank">Korean</a> | <a href="https://ai-coding-guide-with-gstack.vercel.app/ai-coding-setup-guide-en.html" target="_blank">English</a> | <a href="https://ai-coding-guide-with-gstack.vercel.app/ai-coding-setup-guide-ja.html" target="_blank">Japanese</a>
 
 ---
 

@@ -2,9 +2,9 @@
 
 > **Claude Code + Codex + gstack + Ralph** — AIコーディングエージェントを構造化された仮想開発チームに変える完全ガイド。
 
-**[ガイドを読む](https://ai-coding-guide-with-gstack.vercel.app)**
+**<a href="https://ai-coding-guide-with-gstack.vercel.app" target="_blank">ガイドを読む</a>**
 
-[한국어](https://ai-coding-guide-with-gstack.vercel.app/ai-coding-setup-guide-ko.html) | [English](https://ai-coding-guide-with-gstack.vercel.app/ai-coding-setup-guide-en.html) | [日本語](https://ai-coding-guide-with-gstack.vercel.app/ai-coding-setup-guide-ja.html)
+<a href="https://ai-coding-guide-with-gstack.vercel.app/ai-coding-setup-guide-ko.html" target="_blank">한국어</a> | <a href="https://ai-coding-guide-with-gstack.vercel.app/ai-coding-setup-guide-en.html" target="_blank">English</a> | <a href="https://ai-coding-guide-with-gstack.vercel.app/ai-coding-setup-guide-ja.html" target="_blank">日本語</a>
 
 ---
 
