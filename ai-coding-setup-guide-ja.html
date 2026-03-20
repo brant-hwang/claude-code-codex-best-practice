@@ -1,0 +1,2456 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    <title>AIコーディングエージェント 完全セットアップガイド</title>
+    <meta property="og:url" content="https://ai-coding-guide-with-gstack.vercel.app/ai-coding-setup-guide-ja.html">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="AIコーディングエージェント 完全セットアップガイド">
+    <meta property="og:description" content="Claude Code + Codex + gstack + Ralphをゼロから構築し、実践で活用する方法まで。">
+    <meta property="og:image" content="https://ai-coding-guide-with-gstack.vercel.app/og/og-ja.png">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="AIコーディングエージェント 完全セットアップガイド">
+    <meta name="twitter:image" content="https://ai-coding-guide-with-gstack.vercel.app/og/og-ja.png">
+
+    <!-- Fonts: Noto Sans JP (clean Japanese) + JetBrains Mono (code) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        /* ===========================================
+           CSS CUSTOM PROPERTIES (THEME)
+           Swiss Modern — toned-down deep blue accent
+           =========================================== */
+        :root {
+            /* Colors */
+            --bg-primary: #ffffff;
+            --bg-dark: #1a1a2e;
+            --bg-light: #f5f5f8;
+            --accent: #3d5a80;
+            --accent-light: #5b7ea1;
+            --accent-muted: rgba(61, 90, 128, 0.08);
+            --accent-border: rgba(61, 90, 128, 0.15);
+            --text-primary: #1a1a1a;
+            --text-secondary: #555;
+            --text-tertiary: #888;
+            --text-on-accent: #ffffff;
+            --code-bg: #1e1e2e;
+            --code-text: #cdd6f4;
+            --code-keyword: #89b4fa;
+            --code-string: #a6e3a1;
+            --code-comment: #6c7086;
+            --table-border: #ddd;
+            --table-header: #e8edf3;
+            --highlight: #e8d44d;
+
+            /* Typography — MUST use clamp() */
+            --font-display: 'Noto Sans JP', sans-serif;
+            --font-body: 'Noto Sans JP', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --title-size: clamp(2rem, 5.5vw, 4.5rem);
+            --h2-size: clamp(1.4rem, 3.5vw, 2.4rem);
+            --h3-size: clamp(1.1rem, 2.2vw, 1.5rem);
+            --body-size: clamp(0.75rem, 1.4vw, 1.05rem);
+            --small-size: clamp(0.65rem, 1vw, 0.85rem);
+            --code-size: clamp(0.65rem, 1.1vw, 0.85rem);
+
+            /* Spacing */
+            --slide-padding: clamp(1.5rem, 4vw, 4rem);
+            --content-gap: clamp(0.5rem, 2vw, 2rem);
+            --element-gap: clamp(0.25rem, 1vw, 1rem);
+
+            /* Animation */
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --duration-normal: 0.6s;
+        }
+
+        /* ===========================================
+           BASE STYLES
+           =========================================== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        /* === VIEWPORT BASE (MANDATORY) === */
+        html { height: 100%; margin: 0; overflow: hidden; }
+        body { height: 100%; margin: 0; display: flex; transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        .slide {
+            min-width: 100vw; width: 100vw; height: 100vh; height: 100dvh;
+            overflow: hidden; flex-shrink: 0;
+            display: flex; flex-direction: column; position: relative;
+        }
+        .slide-content {
+            flex: 1; display: flex; flex-direction: column; justify-content: center;
+            max-height: 100%; overflow: hidden; padding: var(--slide-padding);
+        }
+        .card, .container, .content-box {
+            max-width: min(90vw, 1000px); max-height: min(80vh, 700px);
+        }
+        .feature-list, .bullet-list { gap: clamp(0.4rem, 1vh, 1rem); }
+        .feature-list li, .bullet-list li { font-size: var(--body-size); line-height: 1.4; }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+            gap: clamp(0.5rem, 1.5vw, 1rem);
+        }
+        img, .image-container {
+            max-width: 100%; max-height: min(50vh, 400px); object-fit: contain;
+        }
+        @media (max-height: 700px) {
+            :root {
+                --slide-padding: clamp(0.75rem, 3vw, 2rem);
+                --content-gap: clamp(0.4rem, 1.5vw, 1rem);
+                --title-size: clamp(1.25rem, 4.5vw, 2.5rem);
+                --h2-size: clamp(1rem, 3vw, 1.75rem);
+            }
+        }
+        @media (max-height: 600px) {
+            :root {
+                --slide-padding: clamp(0.5rem, 2.5vw, 1.5rem);
+                --content-gap: clamp(0.3rem, 1vw, 0.75rem);
+                --title-size: clamp(1.1rem, 4vw, 2rem);
+                --body-size: clamp(0.7rem, 1.2vw, 0.95rem);
+            }
+            .nav-dots, .keyboard-hint, .decorative { display: none; }
+        }
+        @media (max-height: 500px) {
+            :root {
+                --slide-padding: clamp(0.4rem, 2vw, 1rem);
+                --title-size: clamp(1rem, 3.5vw, 1.5rem);
+                --h2-size: clamp(0.9rem, 2.5vw, 1.25rem);
+                --body-size: clamp(0.65rem, 1vw, 0.85rem);
+            }
+        }
+        @media (max-width: 600px) {
+            :root { --title-size: clamp(1.25rem, 7vw, 2.5rem); }
+            .grid { grid-template-columns: 1fr; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* ===========================================
+           GLOBAL SLIDE STYLES
+           =========================================== */
+        body {
+            font-family: var(--font-body);
+            color: var(--text-primary);
+            background: var(--bg-primary);
+        }
+
+        /* Grid background */
+        .grid-bg {
+            position: absolute; inset: 0; pointer-events: none;
+            background-image:
+                linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+        .grid-bg-dark {
+            position: absolute; inset: 0; pointer-events: none;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+
+        /* Accent block — right side geometric element */
+        .accent-block {
+            position: absolute; top: 0; right: 0; width: 30%; height: 100%;
+            background: var(--accent);
+            clip-path: polygon(20% 0, 100% 0, 100% 100%, 0% 100%);
+            z-index: 0;
+        }
+        .accent-block-small {
+            display: none;
+        }
+
+        /* Section number watermark */
+        .section-number {
+            position: absolute;
+            bottom: clamp(1rem, 2vw, 2rem);
+            left: clamp(1.5rem, 3vw, 3rem);
+            font-family: var(--font-display); font-weight: 900;
+            font-size: clamp(4rem, 12vw, 10rem);
+            color: rgba(0,0,0,0.03); line-height: 1; z-index: 0;
+            user-select: none;
+        }
+        .section-number-dark {
+            color: rgba(255,255,255,0.04);
+        }
+
+        /* ===========================================
+           TYPOGRAPHY
+           =========================================== */
+        h1 {
+            font-family: var(--font-display); font-weight: 900;
+            font-size: var(--title-size); line-height: 1.08;
+            letter-spacing: -0.03em; color: var(--text-primary);
+        }
+        h2 {
+            font-family: var(--font-display); font-weight: 800;
+            font-size: var(--h2-size); line-height: 1.15;
+            letter-spacing: -0.02em; color: var(--text-primary);
+        }
+        h3 {
+            font-family: var(--font-display); font-weight: 700;
+            font-size: var(--h3-size); line-height: 1.3;
+            color: var(--accent);
+        }
+        p, li {
+            font-family: var(--font-body);
+            font-size: var(--body-size);
+            line-height: 1.65; color: var(--text-secondary);
+        }
+
+        /* ===========================================
+           LABEL / TAG STYLES
+           =========================================== */
+        .label {
+            font-family: var(--font-display); font-weight: 800;
+            font-size: clamp(0.6rem, 0.9vw, 0.75rem);
+            letter-spacing: 0.2em; text-transform: uppercase;
+            color: var(--accent); margin-bottom: clamp(0.5rem, 1vw, 1rem);
+            display: inline-block;
+        }
+        .label-light { color: var(--accent-light); }
+        .tag {
+            display: inline-block; padding: 0.3rem 0.8rem;
+            background: var(--accent-muted); border: 1px solid var(--accent-border);
+            border-radius: 4px; font-size: var(--small-size);
+            font-weight: 600; color: var(--accent);
+        }
+        .tag-dark {
+            background: rgba(255,255,255,0.08);
+            border-color: rgba(255,255,255,0.15);
+            color: var(--accent-light);
+        }
+
+        /* ===========================================
+           SLIDE TYPES
+           =========================================== */
+
+        /* --- Title Slide --- */
+        .title-slide {
+            background: var(--bg-primary); position: relative;
+        }
+        .title-slide .slide-content {
+            max-width: 65%; z-index: 2;
+        }
+        .title-slide h1 { margin-bottom: clamp(0.8rem, 1.5vw, 1.5rem); }
+        .title-slide .subtitle {
+            font-size: clamp(0.85rem, 1.3vw, 1.1rem);
+            color: var(--text-secondary); line-height: 1.6;
+            max-width: 520px;
+        }
+
+        /* --- Section Divider Slide --- */
+        .section-slide {
+            background: var(--bg-dark); color: #fff;
+        }
+        .section-slide .slide-content { z-index: 2; }
+        .section-slide h1 { color: #fff; }
+        .section-slide .label { color: var(--accent-light); }
+        .section-slide .subtitle { color: rgba(255,255,255,0.6); }
+
+        /* --- Content Slide --- */
+        .content-slide { background: var(--bg-primary); }
+        .content-slide .slide-content { z-index: 2; }
+
+        /* --- Code Slide --- */
+        .code-block {
+            background: var(--code-bg); border-radius: 8px;
+            padding: clamp(0.8rem, 1.5vw, 1.2rem);
+            margin-top: clamp(0.5rem, 1vw, 0.8rem);
+            overflow: hidden;
+        }
+        .code-block code {
+            font-family: var(--font-mono); font-size: var(--code-size);
+            color: var(--code-text); line-height: 1.6;
+            display: block; white-space: pre; overflow-x: auto;
+        }
+        .code-block .kw { color: var(--code-keyword); }
+        .code-block .str { color: var(--code-string); }
+        .code-block .cmt { color: var(--code-comment); }
+        .code-lang {
+            position: absolute; top: 8px; right: 12px;
+            font-family: var(--font-mono); font-size: 0.65rem;
+            color: var(--code-comment); text-transform: uppercase;
+        }
+
+        /* --- Table Slide --- */
+        .slide-table {
+            width: 100%; border-collapse: collapse;
+            font-size: clamp(0.65rem, 1.1vw, 0.85rem);
+            margin-top: clamp(0.5rem, 1vw, 0.8rem);
+        }
+        .slide-table th, .slide-table td {
+            padding: clamp(0.3rem, 0.7vw, 0.6rem) clamp(0.5rem, 1vw, 0.8rem);
+            border: 1px solid var(--table-border); text-align: left;
+        }
+        .slide-table th {
+            background: var(--table-header); font-weight: 700;
+            font-family: var(--font-display);
+            font-size: clamp(0.6rem, 1vw, 0.8rem);
+        }
+        .slide-table td { color: var(--text-secondary); }
+
+        /* --- Bullet list --- */
+        .bullets {
+            list-style: none; padding: 0;
+            margin-top: clamp(0.5rem, 1vw, 0.8rem);
+        }
+        .bullets li {
+            padding-left: 1.5em; position: relative;
+            margin-bottom: clamp(0.3rem, 0.6vw, 0.5rem);
+        }
+        .bullets li::before {
+            content: ''; position: absolute; left: 0;
+            top: 0.6em; width: 6px; height: 6px;
+            background: var(--accent); border-radius: 1px;
+        }
+        .bullets-dark li::before { background: var(--accent-light); }
+
+        /* --- Highlight box --- */
+        .highlight-box {
+            background: var(--accent-muted); border-left: 3px solid var(--accent);
+            padding: clamp(0.6rem, 1vw, 1rem) clamp(0.8rem, 1.5vw, 1.2rem);
+            border-radius: 0 6px 6px 0;
+            margin-top: clamp(0.4rem, 0.8vw, 0.6rem);
+        }
+        .highlight-box p { color: var(--text-primary); font-weight: 500; }
+        .highlight-box-dark {
+            background: rgba(255,255,255,0.05);
+            border-left-color: var(--accent-light);
+        }
+        .highlight-box-dark p { color: rgba(255,255,255,0.9); }
+
+        /* --- Two Column --- */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: clamp(1rem, 2vw, 2rem);
+            margin-top: clamp(0.5rem, 1vw, 0.8rem);
+        }
+        @media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
+
+        /* --- Flow diagram (text-based) --- */
+        .flow {
+            display: flex; flex-wrap: wrap; align-items: center; gap: clamp(0.3rem, 0.5vw, 0.5rem);
+            margin-top: clamp(0.5rem, 1vw, 0.8rem);
+        }
+        .flow-item {
+            padding: clamp(0.25rem, 0.5vw, 0.4rem) clamp(0.5rem, 1vw, 0.8rem);
+            background: var(--accent-muted); border-radius: 4px;
+            font-size: var(--small-size); font-weight: 600; color: var(--accent);
+        }
+        .flow-arrow {
+            font-size: var(--small-size); color: var(--text-tertiary);
+        }
+
+        /* ===========================================
+           ANIMATIONS
+           =========================================== */
+        .reveal {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .slide.visible .reveal { opacity: 1; }
+
+        .reveal-left {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .slide.visible .reveal-left { opacity: 1; }
+
+        /* ===========================================
+           PROGRESS BAR
+           =========================================== */
+        .progress-bar {
+            position: fixed; top: 0; left: 0; height: 3px;
+            background: var(--accent); z-index: 9999;
+            transition: width 0.3s ease; width: 0%;
+        }
+
+        /* Nav dots removed */
+
+        /* ===========================================
+           EDIT MODE (Opt-in)
+           =========================================== */
+        .edit-hotzone {
+            position: fixed; top: 0; left: 0;
+            width: 80px; height: 80px; z-index: 10000; cursor: pointer;
+        }
+        .edit-toggle {
+            position: fixed; top: 12px; left: 12px;
+            width: 36px; height: 36px; border-radius: 50%;
+            background: var(--accent); color: #fff;
+            border: none; font-size: 16px; cursor: pointer;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.3s ease, transform 0.2s ease;
+            z-index: 10001; display: flex; align-items: center; justify-content: center;
+        }
+        .edit-toggle.show, .edit-toggle.active {
+            opacity: 1; pointer-events: auto;
+        }
+        .edit-toggle:hover { transform: scale(1.1); }
+
+        [contenteditable="true"] {
+            outline: 2px dashed var(--accent);
+            outline-offset: 2px; cursor: text;
+            border-radius: 2px;
+        }
+        .edit-banner {
+            position: fixed; bottom: 20px; left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent); color: #fff;
+            padding: 8px 20px; border-radius: 20px;
+            font-size: 0.8rem; font-weight: 600; z-index: 10001;
+            display: none; font-family: var(--font-body);
+        }
+        .edit-banner.show { display: block; }
+
+        /* ===========================================
+           KEYBOARD HINT
+           =========================================== */
+        .keyboard-hint {
+            position: fixed; bottom: clamp(8px, 1.5vw, 16px);
+            right: clamp(8px, 1.5vw, 20px);
+            font-family: var(--font-mono); font-size: 0.65rem;
+            color: var(--text-tertiary); z-index: 9998;
+            opacity: 0.5;
+        }
+
+        /* === SLIDE COUNTER === */
+        .slide-counter {
+            position: fixed; bottom: clamp(8px, 1.5vw, 16px);
+            left: clamp(12px, 2vw, 24px);
+            font-family: var(--font-mono); font-size: clamp(0.65rem, 1vw, 0.8rem);
+            color: var(--text-tertiary); z-index: 9998;
+            opacity: 0.5; transition: opacity 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Progress Bar -->
+<div class="progress-bar" id="progressBar"></div>
+
+
+<!-- Edit Mode -->
+<div class="edit-hotzone" id="editHotzone"></div>
+<button class="edit-toggle" id="editToggle" title="Edit mode (E)">&#9998;</button>
+<div class="edit-banner" id="editBanner">Edit Mode — Click text to edit · Ctrl+S to save</div>
+
+<!-- Slide counter -->
+<div class="slide-counter" id="slideCounter">1 / 76</div>
+
+<!-- Keyboard hint -->
+<div class="keyboard-hint">←→ / Space</div>
+
+
+<!-- ====================================================
+     SLIDE 1: TITLE
+     ==================================================== -->
+<section class="slide title-slide" data-slide="0">
+    <div class="grid-bg"></div>
+    <div class="accent-block"></div>
+    <div class="slide-content">
+        <p class="label reveal">Complete Setup Guide</p>
+        <h1 class="reveal">AIコーディング<br>エージェント<br>セットアップガイド</h1>
+        <p class="subtitle reveal">Claude Code + Codex + gstack + Ralphをゼロから構築し、実践で活用する方法まで。</p>
+        <div style="margin-top: clamp(0.8rem,1.5vw,1.5rem)">
+            <span class="tag reveal">2026-03-20</span>
+        </div>
+        <div class="reveal" style="margin-top:clamp(1rem,2vw,2rem); font-size:var(--small-size); color:var(--text-secondary); line-height:1.7;">
+            <strong style="color:var(--text-primary);">Brant Hwang</strong> · brant@querypie.com<br>
+            Founder & CEO at QueryPie AI · <a href="https://www.querypie.com" target="_blank" style="color:var(--accent); text-decoration:none;">www.querypie.com</a>
+        </div>
+    </div>
+    <div class="section-number">01</div>
+</section>
+
+
+<!-- ====================================================
+     SLIDE 1.5: このドキュメントについて
+     ==================================================== -->
+<section class="slide content-slide" data-slide="0a">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">About</p>
+        <h2 class="reveal">このドキュメントについて</h2>
+        <p class="reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem); line-height:1.8;">
+            このドキュメントは<strong>Brant Hwang</strong>がすべて自ら草稿を作成し、AIで内容を整理した後、<strong>frontend-slides</strong>スキルを使用してHTMLベースのスライドを生成し、Vercelにデプロイした成果物です。
+        </p>
+        <div class="highlight-box reveal" style="margin-top:clamp(0.8rem,1.5vw,1.2rem);">
+            <p style="font-size:var(--small-size); line-height:1.7;">
+                スライド生成スキル: <span style="color:var(--accent);">github.com/zarazhangrui/frontend-slides</span>
+            </p>
+        </div>
+    </div>
+</section>
+
+
+<!-- ====================================================
+     SLIDE 2: 目次
+     ==================================================== -->
+<section class="slide content-slide" data-slide="1">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">Overview</p>
+        <h2 class="reveal">目次</h2>
+        <ol class="reveal" style="padding-left:1.5em; margin-top:clamp(0.5rem,1vw,0.8rem); list-style:decimal;" start="0">
+            <li><a href="javascript:void(0)" onclick="navigateToId('sec-intro')" style="color:var(--accent); text-decoration:none; border-bottom:1px solid var(--accent-border);">なぜこのガイドを作ったのか</a></li>
+            <li><a href="javascript:void(0)" onclick="navigateToId('sec-1')" style="color:var(--accent); text-decoration:none; border-bottom:1px solid var(--accent-border);">既存環境の完全削除</a></li>
+            <li><a href="javascript:void(0)" onclick="navigateToId('sec-2')" style="color:var(--accent); text-decoration:none; border-bottom:1px solid var(--accent-border);">クリーンインストール & 最小構成</a></li>
+            <li><a href="javascript:void(0)" onclick="navigateToId('sec-3')" style="color:var(--accent); text-decoration:none; border-bottom:1px solid var(--accent-border);">ハーネスエンジニアリングが重要な理由</a></li>
+            <li><a href="javascript:void(0)" onclick="navigateToId('sec-4')" style="color:var(--accent); text-decoration:none; border-bottom:1px solid var(--accent-border);">ハーネスエンジニアリングのためのスキル一元管理</a></li>
+            <li><a href="javascript:void(0)" onclick="navigateToId('sec-5')" style="color:var(--accent); text-decoration:none; border-bottom:1px solid var(--accent-border);">gstack 詳細</a></li>
+            <li><a href="javascript:void(0)" onclick="navigateToId('sec-6')" style="color:var(--accent); text-decoration:none; border-bottom:1px solid var(--accent-border);">CLAUDE.md / AGENTS.md 設定</a></li>
+            <li><a href="javascript:void(0)" onclick="navigateToId('sec-7')" style="color:var(--accent); text-decoration:none; border-bottom:1px solid var(--accent-border);">実践例: gstack + RalphでTodo Webアプリを作る</a></li>
+            <li><a href="javascript:void(0)" onclick="navigateToId('sec-a')" style="color:var(--accent); text-decoration:none; border-bottom:1px solid var(--accent-border);">Appendix — Claude Code 内部構造を理解する</a></li>
+        </ol>
+    </div>
+</section>
+
+
+<!-- ====================================================
+     SLIDE 2.5: イントロ — なぜこのガイドを作ったのか
+     ==================================================== -->
+<section class="slide content-slide" id="sec-intro" data-slide="2a">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">Intro</p>
+        <h2 class="reveal">なぜこのガイドを作ったのか</h2>
+        <p class="reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem); line-height:1.8;">
+            Garry Tan（Y-Combinator CEO）が公開した<strong>gstack</strong>を使ってみたところ、自分の仕事のスタイルにぴったりのハーネスだった。企画からレビュー、QA、デプロイ、振り返りまで。まるでY-Combinator時代の素早く動く初期スタートアップのような感覚を、AIハーネスで実現した感じだった。
+        </p>
+        <p class="reveal" style="margin-top:clamp(0.4rem,0.8vw,0.6rem); line-height:1.8;">
+            そこで、AIコーディング環境をゼロから完全に再構築することにした。bkit、superpower、oh my codex、oh my claude codeなど数多くのハーネスをテストしてきた結果、ローカル環境には不要なファイルも多く、一度整理する必要があると感じた。
+        </p>
+        <div class="highlight-box reveal" style="margin-top:clamp(0.6rem,1vw,1rem);">
+            <p>そして、どうせやり直すなら、一度整理しておけば初めての人の助けになるだろうと思い、このドキュメントを作成した。</p>
+        </div>
+    </div>
+</section>
+
+
+<!-- ====================================================
+     SLIDE 3: SECTION — 1. 既存環境の完全削除
+     ==================================================== -->
+<section class="slide section-slide" id="sec-1" data-slide="2">
+    <div class="grid-bg-dark"></div>
+    <div class="slide-content" style="align-items:center; text-align:center;">
+        <p class="label reveal" style="color:var(--accent-light);">Section 01</p>
+        <h1 class="reveal" style="color:#fff;">既存環境の<br>完全削除</h1>
+        <p class="subtitle reveal" style="color:rgba(255,255,255,0.5); margin-top:0.8rem;">既存の設定をすべてクリーンにしてから始める。</p>
+    </div>
+    <div class="section-number section-number-dark">01</div>
+</section>
+
+
+<!-- SLIDE 4: Claude Code 削除 -->
+<section class="slide content-slide" data-slide="3">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">1-1</p>
+        <h2 class="reveal">Claude Code をすべて削除</h2>
+        <div class="code-block reveal" style="position:relative; margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <span class="code-lang">bash</span>
+            <code><span class="kw">rm</span> -rf ~/.claude.json
+<span class="kw">rm</span> -rf ~/.claude
+<span class="kw">rm</span> -rf ~/.mcp.json
+<span class="kw">rm</span> -f ~/.local/bin/claude
+<span class="kw">rm</span> -rf ~/.local/share/claude</code>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 5: Codex 削除 -->
+<section class="slide content-slide" data-slide="4">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">1-2</p>
+        <h2 class="reveal">Codex & Oh My Codex 削除</h2>
+        <div class="code-block reveal" style="position:relative; margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <span class="code-lang">bash</span>
+            <code><span class="kw">npm</span> uninstall @openai/codex
+<span class="kw">omx</span> uninstall
+<span class="kw">rm</span> -rf ~/.codex
+<span class="kw">rm</span> -rf ~/.omx</code>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 6: .agents 削除 -->
+<section class="slide content-slide" data-slide="5">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">1-3</p>
+        <h2 class="reveal">.agents 削除</h2>
+        <div class="code-block reveal" style="position:relative; margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <span class="code-lang">bash</span>
+            <code><span class="kw">rm</span> -rf ~/.agents</code>
+        </div>
+        <div class="highlight-box reveal" style="margin-top:clamp(0.8rem,1.5vw,1.2rem);">
+            <p>これで完全なクリーン状態に戻った。</p>
+        </div>
+    </div>
+</section>
+
+
+<!-- ====================================================
+     SLIDE 7: SECTION — 2. クリーンインストール & 最小構成
+     ==================================================== -->
+<section class="slide section-slide" id="sec-2" data-slide="6">
+    <div class="grid-bg-dark"></div>
+    <div class="slide-content" style="align-items:center; text-align:center;">
+        <p class="label reveal" style="color:var(--accent-light);">Section 02</p>
+        <h1 class="reveal" style="color:#fff;">クリーンインストール &<br>最小構成</h1>
+    </div>
+    <div class="section-number section-number-dark">02</div>
+</section>
+
+
+<!-- SLIDE 8: Claude Code + RTK インストール -->
+<section class="slide content-slide" data-slide="7">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">2-1</p>
+        <h2 class="reveal">Claude Code & RTK インストール</h2>
+        <div class="code-block reveal" style="position:relative; margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <span class="code-lang">bash</span>
+            <code><span class="kw">curl</span> -fsSL https://claude.ai/install.sh | bash
+<span class="kw">brew</span> install rtk   <span class="cmt"># または brew upgrade rtk</span>
+<span class="kw">rtk</span> init --global</code>
+        </div>
+        <div class="highlight-box reveal" style="margin-top:clamp(0.6rem,1vw,1rem);">
+            <p><strong>RTK</strong>はLLMトークンパターンを分析してトークン使用量を<strong>60～90%</strong>まで削減するLLM Proxy。Claude Codeのコストを大幅に節約できる。</p>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 9: Codex インストール -->
+<section class="slide content-slide" data-slide="8">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">2-2</p>
+        <h2 class="reveal">Codex インストール</h2>
+        <div class="code-block reveal" style="position:relative; margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <span class="code-lang">bash</span>
+            <code><span class="kw">brew</span> install --cask codex</code>
+        </div>
+        <div class="highlight-box reveal" style="margin-top:clamp(0.6rem,1vw,1rem);">
+            <p>&#9888;&#65039; npmでインストールすると、miseでローカルnode環境を使う際にプロジェクトごとにPATHが変わる問題が発生する。<strong>brewでインストールすること。</strong></p>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 10: Codex 設定 -->
+<section class="slide content-slide" data-slide="9">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">2-3</p>
+        <h2 class="reveal">Codex 1M Context & Fast Mode</h2>
+        <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);"><code style="font-family:var(--font-mono);">~/.codex/config.toml</code></p>
+        <div class="code-block reveal" style="position:relative; margin-top:clamp(0.4rem,0.8vw,0.6rem);">
+            <span class="code-lang">toml</span>
+            <code><span class="kw">model</span> = <span class="str">"gpt-5.4"</span>
+<span class="kw">model_context_window</span> = <span class="str">1000000</span>
+<span class="kw">model_reasoning_effort</span> = <span class="str">"high"</span>
+<span class="kw">service_tier</span> = <span class="str">"fast"</span></code>
+        </div>
+    </div>
+</section>
+
+
+<!-- ====================================================
+     SECTION — 3. ハーネスエンジニアリングが重要な理由
+     ==================================================== -->
+<section class="slide section-slide" id="sec-3" data-slide="10">
+    <div class="grid-bg-dark"></div>
+    <div class="slide-content" style="align-items:center; text-align:center;">
+        <p class="label reveal" style="color:var(--accent-light);">Section 03</p>
+        <h1 class="reveal" style="color:#fff;">ハーネスエンジニアリングが<br>重要な理由</h1>
+    </div>
+</section>
+
+
+<!-- SLIDE: Engineering Evolution -->
+<section class="slide content-slide" data-slide="11">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">3-1</p>
+        <h2 class="reveal">エンジニアリングの進化</h2>
+        <table class="slide-table reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <tr><th>時代</th><th>コア能力</th><th>核心の問い</th></tr>
+            <tr><td><strong>2024</strong></td><td>プロンプトエンジニアリング</td><td>AIに「何をしてほしいか」を上手く伝える技術</td></tr>
+            <tr><td><strong>2025</strong></td><td>コンテキストエンジニアリング</td><td>AIに「必要な情報」を上手く渡す技術</td></tr>
+            <tr><td><strong>2026</strong></td><td>ハーネスエンジニアリング</td><td>AIが「正しくやるしかない環境」を設計する技術</td></tr>
+        </table>
+        <p class="reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem); font-size:var(--small-size); color:var(--text-secondary);">2024年の競争力：良いプロンプトを書ける人 → 2025年：エージェントを作れる人 → 2026年：AIが働く環境を設計できる人</p>
+    </div>
+</section>
+
+
+<!-- SLIDE: Why the Evolution Happened -->
+<section class="slide content-slide" data-slide="12">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">3-2</p>
+        <h2 class="reveal">なぜこう変化したか — LLMの発展とともに</h2>
+        <ul class="bullets reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <li><strong>初期LLM（GPT-3〜3.5）</strong> — コンテキストウィンドウは4Kトークン。短いプロンプトの中でできるだけ明確に指示するのが全て。「プロンプトエンジニアリング」時代</li>
+            <li><strong>中期LLM（GPT-4、Claude 3）</strong> — コンテキストが128K〜200Kに拡大。コードベース、ドキュメント、履歴をまるごと入れられるように。「何を見せるか」が核心となった「コンテキストエンジニアリング」時代</li>
+            <li><strong>現在のLLM（Claude 4、GPT-5）</strong> — エージェントが自律的にコードを書き、コミットし、PRまで作成。問題は「一回の回答」ではなく「数百回の自律行動」をどう制御するか。「ハーネスエンジニアリング」時代</li>
+        </ul>
+        <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem); font-size:var(--small-size); color:var(--text-tertiary);">Karpathy: 「LLMをCPU、コンテキストウィンドウをRAMと考えよ。エンジニアの役割はOS — タスクに最適なコードとデータをメモリにロードすること。」</p>
+    </div>
+</section>
+
+
+<!-- SLIDE: Context Engineering -->
+<section class="slide content-slide" data-slide="13">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">3-3</p>
+        <h2 class="reveal">① コンテキストエンジニアリング — AIに何を伝えるか</h2>
+        <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">新入社員に説明なしで「働け」と言っても無理です。AIも同じです。</p>
+        <ul class="bullets reveal" style="margin-top:clamp(0.4rem,0.8vw,0.6rem);">
+            <li>プロジェクトルール、コーディング規約、作業状況… これらを<strong>CLAUDE.md、AGENTS.md</strong>などの文書で整理して渡す必要があります</li>
+            <li>エージェントが読めない情報は<strong>存在しないのと同じ</strong>です</li>
+            <li>Cognition（Devinチーム）: 「コンテキストエンジニアリングは事実上、AIエージェントを構築するエンジニアの最優先業務だ」</li>
+        </ul>
+        <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem); font-size:var(--small-size); color:var(--text-tertiary);">Anthropic: 「長時間実行エージェントは、以前何があったか記憶なしに新しいセッションを開始する。引き継ぎ文書なしで交代勤務するエンジニアと同じだ。」</p>
+    </div>
+</section>
+
+
+<!-- SLIDE: Architecture Constraints -->
+<section class="slide content-slide" data-slide="14">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">3-4</p>
+        <h2 class="reveal">② アーキテクチャ制約 — AIがやってはいけないことを決める</h2>
+        <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">ボウリングのバンパーのように、自由を与えると迷走し、境界を設けるとむしろ早く正解に辿り着きます。</p>
+        <ul class="bullets reveal" style="margin-top:clamp(0.4rem,0.8vw,0.6rem);">
+            <li>逆説的ですが、<strong>制約が生産性を高めます</strong></li>
+            <li>Mitchell Hashimoto（HashiCorp創業者）: 「エージェントがミスをするたびに、そのミスを二度とできないようハーネスに解決策を追加せよ」</li>
+            <li>OpenAI Codexチーム: 依存性フロー、レイヤー分離、カスタムリンターを制約として設定し、エージェントの信頼性を劇的に向上</li>
+            <li>KarpathyのCLAUDE.mdがまさにこのアプローチ — 「どうコーディングするか」ではなく<strong>「やるべきでないこと」</strong>を明確にしたもの</li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- SLIDE: Garbage Collection -->
+<section class="slide content-slide" data-slide="15">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">3-5</p>
+        <h2 class="reveal">③ ガベージコレクション — AIが作ったゴミを片付ける</h2>
+        <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">AIは良いパターンも複製しますが、悪いパターンも複製します。整理しなければ品質は時間とともに低下します。</p>
+        <ul class="bullets reveal" style="margin-top:clamp(0.4rem,0.8vw,0.6rem);">
+            <li>OpenAIチームは当初<strong>毎週金曜日を「AIスロップ清掃日」</strong>として使用 — 勤務時間の20%を整理に投入</li>
+            <li>最終的に自動クリーンアップシステムをハーネスに内蔵：バックグラウンドエージェントがアーキテクチャ違反をスキャンしリファクタリングPRを自動生成</li>
+            <li>OpenAI: 「技術的負債は高金利ローンだ。放置すると複利で膨らみ、少しずつ返済し続ける方が常に良い」</li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- SLIDE: Real Results -->
+<section class="slide content-slide" data-slide="16">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">3-6</p>
+        <h2 class="reveal">ハーネスエンジニアリングの実際の成果</h2>
+        <ul class="bullets reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <li><strong>OpenAI Codex</strong> — 100万行以上のプロダクションコード、人間が直接書いた行数ゼロ。5ヶ月で約1,500 PR。エンジニア3人で1人あたり1日3.5 PR</li>
+            <li><strong>LangChain</strong> — 同じモデル（GPT-5.2-Codex）でハーネスだけ改善したらベンチマーク52.8%→66.5%、ランキング30位圏外→Top 5</li>
+            <li><strong>Stripe</strong> — 社内AIエージェントが週1,000件以上のPRをマージ</li>
+        </ul>
+        <p class="reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem); font-size:var(--small-size); color:var(--text-tertiary);">Martin Fowler: 「ハーネスエンジニアリングはコンテキストエンジニアリング、アーキテクチャ制約、ガベージコレクションを含む概念だ。」</p>
+    </div>
+</section>
+
+
+<!-- ====================================================
+     SLIDE 11: SECTION — 4. ハーネスエンジニアリングのためのスキル一元管理
+     ==================================================== -->
+<section class="slide section-slide" id="sec-4" data-slide="10">
+    <div class="grid-bg-dark"></div>
+    <div class="slide-content" style="align-items:center; text-align:center;">
+        <p class="label reveal" style="color:var(--accent-light);">Section 04</p>
+        <h1 class="reveal" style="color:#fff;">ハーネスエンジニアリングのための<br>スキル一元管理</h1>
+    </div>
+    <div class="section-number section-number-dark">04</div>
+</section>
+
+
+<!-- SLIDE 12: 問題認識 -->
+<section class="slide content-slide" data-slide="11">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">4-1</p>
+        <h2 class="reveal">問題: 両方を同じスキルで管理したい</h2>
+        <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">Claude Code EnterpriseとCodex Enterpriseの両方を使用しているため、ハーネスを変更したら両方に適用する必要があります。これを簡単にするために一元管理が必要です。</p>
+        <ul class="bullets reveal" style="margin-top:clamp(0.4rem,0.8vw,0.6rem);">
+            <li>Claude Code: <code>/plugin</code>でインストール → <code>~/.claude/plugins/cache</code>に保存、System Promptに自動注入</li>
+            <li><code>/plugin</code>でインストールすると<code>/skills</code>には表示されず、<code>/context</code>で確認可能</li>
+            <li>自動更新という利点はあるが...</li>
+            <li><strong>CodexにはまだMarketplaceがない</strong> → 両方の管理問題が発生</li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- SLIDE 13: 管理方法の比較 1 -->
+<section class="slide content-slide" data-slide="12">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">4-2</p>
+        <h2 class="reveal">管理方法の比較</h2>
+        <table class="slide-table reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <tr><th>ツール</th><th>一元管理</th><th>Claude/Codex同時対応</th><th>判断</th></tr>
+            <tr><td><strong>skills.sh</strong></td><td>Webレジストリ + CLI</td><td>公式対応</td><td style="color:var(--accent);font-weight:700;">最も完成度の高い選択</td></tr>
+            <tr><td><strong>OpenSkills</strong></td><td>GitHubベースローダー</td><td>対応明記</td><td>汎用パッケージマネージャ</td></tr>
+            <tr><td><strong>SkillDeck</strong></td><td>ローカルGUIアプリ</td><td>対応含む</td><td>個人Mac環境OK、チームは微妙</td></tr>
+            <tr><td><strong>installagentskills</strong></td><td>カタログ性格</td><td>ガイドのみ</td><td>判断補助用</td></tr>
+        </table>
+    </div>
+</section>
+
+
+<!-- SLIDE 14: 最終選択 -->
+<section class="slide content-slide" data-slide="13">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">4-3</p>
+        <h2 class="reveal">最終選択: skills.sh</h2>
+        <ul class="bullets reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <li>SkillDeckはMacで綺麗なGUIによる直感的な管理が可能だが、</li>
+            <li>ターミナル操作に慣れているので<strong>skills.sh</strong>を採用</li>
+            <li><code>npx skills check</code>、<code>npx skills update</code>で最新バージョンを維持</li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- SLIDE 14.5: ハーネス比較 — なぜgstackか -->
+<section class="slide content-slide" data-slide="13b">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">4-3b</p>
+        <h2 class="reveal">なぜgstackをハーネスに選んだのか</h2>
+        <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">すでにsuperpowers、bkit、omxなど色々試してきたが、<strong>gstack</strong>が自分のスタイルに一番合っていると感じたので、今回はgstackをメインハーネスとして使うことにした。gstackの詳細については後編でさらに詳しく取り上げる。</p>
+        <table class="slide-table reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <tr><th>ツール</th><th>強み</th><th>弱み</th></tr>
+
+            <tr><td><strong>superpowers</strong></td><td>豊富なスキルバンドル、活発なコミュニティ</td><td>opinionatedでないためプロセス強制力が弱い、ブラウザ自動化なし</td></tr>
+            <tr><td><strong>bkit</strong></td><td>汎用性が高い、柔軟な拡張</td><td>スプリントワークフロー未対応、QA/デプロイパイプライン不在</td></tr>
+            <tr><td style="color:var(--accent);font-weight:700;">gstack</td><td style="color:var(--accent);">企画→レビュー→QA→デプロイ→振り返りの全工程を構造化、100ms級persistent ブラウザ、並列sprint対応</td><td>強くopinionated、macOS中心のクッキー復号化、iframe未対応</td></tr>
+        </table>
+        <div class="highlight-box reveal" style="margin-top:clamp(0.4rem,0.8vw,0.6rem);">
+            <p>決定理由：<strong>プロセス強制力＋ブラウザ自動化＋品質ゲート</strong>をすべて備えた唯一の選択肢。</p>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 15: インストールした主要スキル 1 -->
+<section class="slide content-slide" data-slide="14">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">4-4</p>
+        <h2 class="reveal">インストールした主要スキル (1/2)</h2>
+        <div class="code-block reveal" style="position:relative; margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <span class="code-lang">bash</span>
+            <code>npx skills add https://github.com/anthropics/skills --skill <span class="str">skill-creator</span>
+npx skills add https://github.com/anthropics/skills --skill <span class="str">pdf</span>
+npx skills add https://github.com/anthropics/skills --skill <span class="str">xlsx</span>
+npx skills add https://github.com/anthropics/skills --skill <span class="str">mcp-builder</span>
+npx skills add https://github.com/anthropics/skills --skill <span class="str">frontend-design</span>
+npx skills add https://github.com/obra/superpowers --skill <span class="str">using-superpowers</span></code>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 16: インストールした主要スキル 2 -->
+<section class="slide content-slide" data-slide="15">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">4-5</p>
+        <h2 class="reveal">インストールした主要スキル (2/2)</h2>
+        <div class="code-block reveal" style="position:relative; margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <span class="code-lang">bash</span>
+            <code>npx skills add <span class="str">vercel/vercel</span>
+npx skills add https://github.com/vercel-labs/agent-skills --skill <span class="str">vercel-react-best-practices</span>
+npx skills add https://github.com/vercel-labs/agent-skills --skill <span class="str">web-design-guidelines</span>
+npx skills add https://github.com/zarazhangrui/frontend-slides --skill <span class="str">frontend-slides</span>
+npx skills add https://github.com/garrytan/gstack.git --skill <span class="str">gstack</span>
+npx skills add https://github.com/supercent-io/skills-template --skill <span class="str">ralph</span>
+npx skills add https://github.com/obra/superpowers --skill <span class="str">using-superpowers</span></code>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 17: インストール時のオプション -->
+<section class="slide content-slide" data-slide="16">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">4-6</p>
+        <h2 class="reveal">インストール時のオプション: Global + Symbolic Link</h2>
+        <ul class="bullets reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <li><code>~/.agents/skills</code>にgit clone → <code>~/.claude/skills</code>にシンボリックリンク</li>
+            <li>新バージョンが出たら両方（Claude Code & Codex）に同時反映</li>
+            <li>Codexは<code>~/.agents/skills</code>を自動参照するため別途リンク不要</li>
+        </ul>
+        <div class="highlight-box reveal" style="margin-top:clamp(0.6rem,1vw,1rem);">
+            <p>Codex内蔵のSkill Creator / Skill Installerは、Vercelのfind-skills、Anthropicのskill-creatorの方が優れているため<strong>Disable推奨。</strong></p>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 18: Claude Hud -->
+<section class="slide content-slide" data-slide="17">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">4-7</p>
+        <h2 class="reveal">Claude Hud（Claude Code専用）</h2>
+        <ul class="bullets reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <li>使用量、モデル、ブランチ、現在のディレクトリなどを下部ステータスバーに表示</li>
+            <li>Claude Code環境でのみ別途インストール</li>
+        </ul>
+        <div class="reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <img src="images/claude-hud-preview.png" alt="Claude HUD preview" style="max-width:100%; border-radius:8px; box-shadow:0 2px 12px rgba(0,0,0,0.10);">
+        </div>
+        <p class="reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem); font-size:var(--small-size); color:var(--text-tertiary);">GitHub: <a href="https://github.com/jarrodwatts/claude-hud" target="_blank" style="color:var(--accent-light); text-decoration:none;">github.com/jarrodwatts/claude-hud</a></p>
+    </div>
+</section>
+
+
+<!-- ====================================================
+     SLIDE 19: SECTION — 5. gstack 詳細
+     ==================================================== -->
+<section class="slide section-slide" id="sec-5" data-slide="18">
+    <div class="grid-bg-dark"></div>
+    <div class="slide-content" style="align-items:center; text-align:center;">
+        <p class="label reveal" style="color:var(--accent-light);">Section 05</p>
+        <h1 class="reveal" style="color:#fff;">gstack<br>詳細</h1>
+    </div>
+    <div class="section-number section-number-dark">05</div>
+</section>
+
+
+<!-- SLIDE 20: gstackとは -->
+<section class="slide content-slide" data-slide="19">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">5-1</p>
+        <h2 class="reveal">gstackとは？</h2>
+        <div class="highlight-box reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <p>「AIコーディングエージェントをチャット型アシスタントではなく、<strong>役割が分離された仮想開発チーム</strong>のように運用するためのスキルパック + 超高速ブラウザ自動化ツール」</p>
+        </div>
+        <p class="reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">核心は新しいモデルではなく、<strong>開発プロセスを強く構造化する</strong>という点。</p>
+        <p class="reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem); font-size:var(--small-size); color:var(--text-tertiary);">GitHub: <a href="https://github.com/garrytan/gstack" target="_blank" style="color:var(--accent-light); text-decoration:none;">github.com/garrytan/gstack</a></p>
+    </div>
+</section>
+
+
+<!-- SLIDE 21: 本体の3つの要素 -->
+<section class="slide content-slide" data-slide="20">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">5-2</p>
+        <h2 class="reveal">gstackの本体</h2>
+        <ol class="reveal" style="padding-left:1.5em; margin-top:clamp(0.5rem,1vw,0.8rem); list-style:decimal;">
+            <li><strong>SKILL.mdベースのワークフロースキル群</strong></li>
+            <li><strong>Bun + Playwright</strong>で構築されたpersistent browser daemon</li>
+            <li>この2つをインストール/同期/検証する<strong>スクリプト群</strong></li>
+        </ol>
+        <div class="highlight-box reveal" style="margin-top:clamp(0.6rem,1vw,1rem);">
+            <p>宣伝文句を取り除くと、本質は<strong>「プロンプトOS + 高速ブラウザQA」</strong></p>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 22: なぜ使うのか -->
+<section class="slide content-slide" data-slide="21">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">5-3</p>
+        <h2 class="reveal">なぜ使うのか</h2>
+        <div class="two-col reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <div>
+                <h3 style="font-size:var(--body-size); margin-bottom:0.3rem;">プロセスの強制</h3>
+                <p>企画→設計→実装→レビュー→QA→デプロイ→振り返りをコマンド型スキルで強制</p>
+            </div>
+            <div>
+                <h3 style="font-size:var(--body-size); margin-bottom:0.3rem;">高速ブラウザ</h3>
+                <p>一度起動したChromiumを維持、以降のコマンド<strong>100～200ms</strong></p>
+            </div>
+            <div>
+                <h3 style="font-size:var(--body-size); margin-bottom:0.3rem;">並列作業</h3>
+                <p>ワークスペースごとに独立したブラウザ/状態/ログ</p>
+            </div>
+            <div>
+                <h3 style="font-size:var(--body-size); margin-bottom:0.3rem;">品質ゲート</h3>
+                <p>コードだけでなくバグ・テスト・ドキュメント・リリースまで一括管理</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 23: インストール方法 -->
+<section class="slide content-slide" data-slide="22">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">5-4</p>
+        <h2 class="reveal">インストール方法</h2>
+        <div class="two-col reveal">
+            <div>
+                <h3 style="font-size:var(--body-size); margin-bottom:0.3rem;">Claude Code</h3>
+                <div class="code-block" style="margin-top:0.3rem;"><code><span class="kw">git clone</span> ...gstack.git ~/.claude/skills/gstack
+<span class="kw">cd</span> ~/.claude/skills/gstack && ./setup</code></div>
+            </div>
+            <div>
+                <h3 style="font-size:var(--body-size); margin-bottom:0.3rem;">Codex</h3>
+                <div class="code-block" style="margin-top:0.3rem;"><code><span class="kw">git clone</span> ...gstack.git ~/.codex/skills/gstack
+<span class="kw">cd</span> ~/.codex/skills/gstack && ./setup --host codex</code></div>
+            </div>
+        </div>
+        <ul class="bullets reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <li>./setup: Bun確認 → browseビルド → Playwright Chromium → シンリンク作成 → 状態ディレクトリ準備</li>
+            <li>要件: <strong>Git, Bun, ホストエージェント</strong></li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- SLIDE 24: 実際の使用フロー -->
+<section class="slide content-slide" data-slide="23">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">5-5</p>
+        <h2 class="reveal">実際の使用フロー</h2>
+        <div class="flow reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <span class="flow-item">/office-hours</span><span class="flow-arrow">→</span>
+            <span class="flow-item">/plan-ceo-review</span><span class="flow-arrow">→</span>
+            <span class="flow-item">/plan-eng-review</span><span class="flow-arrow">→</span>
+            <span class="flow-item">/plan-design-review</span>
+        </div>
+        <div class="flow reveal" style="margin-top:clamp(0.3rem,0.5vw,0.4rem);">
+            <span class="flow-arrow">→</span>
+            <span class="flow-item" style="background:var(--accent); color:#fff;">実装（直接指示）</span><span class="flow-arrow">→</span>
+            <span class="flow-item">/investigate</span>
+        </div>
+        <div class="flow reveal" style="margin-top:clamp(0.3rem,0.5vw,0.4rem);">
+            <span class="flow-arrow">→</span>
+            <span class="flow-item">/qa</span><span class="flow-arrow">→</span>
+            <span class="flow-item">/review</span><span class="flow-arrow">→</span>
+            <span class="flow-item">/ship</span><span class="flow-arrow">→</span>
+            <span class="flow-item">/document-release</span><span class="flow-arrow">→</span>
+            <span class="flow-item">/retro</span>
+        </div>
+        <div class="highlight-box reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <p>gstackは「コマンド集」ではなく、事実上<strong>スプリント運用規約</strong>である。「実装専用」スキルはなく、プランレビュー後にClaude Codeへ直接実装を指示する。</p>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 25: 各スキルの役割 1 -->
+<section class="slide content-slide" data-slide="24">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">5-6</p>
+        <h2 class="reveal">主要スキルの役割</h2>
+        <ul class="bullets reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <li><strong>/office-hours</strong> — 機能リクエストをそのまま受けず「本当に何を作りたいのか」企画をリフレーミング</li>
+            <li><strong>/plan-ceo-review</strong> — プロダクトの方向性を広げたり絞ったり再設定する時</li>
+            <li><strong>/plan-eng-review</strong> — アーキテクチャ、データフロー、失敗ケース、テスト計画を固める時</li>
+            <li><strong>/plan-design-review</strong> — 実装前にデザインの完成度を引き上げる時</li>
+            <li><strong>/design-consultation</strong> — デザインシステムをゼロから構築する時</li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- SLIDE 26: 各スキルの役割 2 -->
+<section class="slide content-slide" data-slide="25">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">5-7</p>
+        <h2 class="reveal">実装後のワークフロースキル</h2>
+        <ul class="bullets reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <li><strong>/review</strong> — 構造的バグを見つける偏執的レビュー</li>
+            <li><strong>/qa</strong> — 実際のブラウザでテスト実行、バグ発見時に自動修正 → 再検証</li>
+            <li><strong>/ship</strong> — PR/テスト/カバレッジ/リリースの締め。テストがなければフレームワークまでブートストラップ</li>
+            <li><strong>/document-release</strong> — README、CONTRIBUTINGなどのドキュメントドリフトを修正</li>
+            <li><strong>/retro</strong> — 週次振り返りとチーム/個人メトリクス分析</li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- SLIDE 27: /browse アーキテクチャ -->
+<section class="slide content-slide" data-slide="26">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">5-8</p>
+        <h2 class="reveal">ブラウザがなぜ重要か — /browse</h2>
+        <ul class="bullets reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <li>Playwrightをラップしたcliではなく<strong>ローカルHTTP daemonにコマンドを送るthin client構造</strong></li>
+            <li>状態ファイル<code>.gstack/browse.json</code>にpid, port, tokenを記録</li>
+            <li>セキュリティ: <strong>localhostバインディング + bearer token + 0600権限</strong></li>
+            <li>要素選択: <code>snapshot -i</code>で作成した<code>@e1</code>, <code>@e2</code> ref（アクセシビリティツリーベース）</li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- SLIDE 28: /browse 高度な機能 -->
+<section class="slide content-slide" data-slide="27">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">5-9</p>
+        <h2 class="reveal">/browse 高度な機能</h2>
+        <ul class="bullets reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <li>SPAでref期限切れ → <code>locator.count()</code>で検知、「再度snapshotを取れ」エラーを返す</li>
+            <li>CAPTCHA/MFA → <strong>handoff</strong>でvisible Chrome、ユーザーが通過後<strong>resume</strong></li>
+            <li>「ログイン維持、タブ維持、Cookie維持、高速往復」— MCPブラウザツールとの核心的な違い</li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- SLIDE 29: 何が改善されるか -->
+<section class="slide content-slide" data-slide="28">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">5-10</p>
+        <h2 class="reveal">何が改善されるか</h2>
+        <table class="slide-table reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <tr><th>領域</th><th>改善内容</th></tr>
+            <tr><td>企画品質</td><td>機能リクエストをプロダクト課題として再定義</td></tr>
+            <tr><td>実装品質</td><td>ダイアグラム、失敗モード、テストマトリクスの強制</td></tr>
+            <tr><td>UI品質</td><td>「AIスロップ」を減らす強い美的基準</td></tr>
+            <tr><td>QA品質</td><td>実際のブラウザクリック → 問題発見 → 修正 → 回帰テスト</td></tr>
+            <tr><td>デプロイ品質</td><td>テストがなければフレームワークまでブートストラップ</td></tr>
+            <tr><td>ドキュメント品質</td><td>ドキュメントドリフトの自動検知と修正</td></tr>
+            <tr><td>マルチエージェント</td><td>Conductorと並列スプリント運用</td></tr>
+        </table>
+    </div>
+</section>
+
+
+<!-- SLIDE 30: スキル全一覧 1 -->
+<section class="slide content-slide" data-slide="29">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">5-11</p>
+        <h2 class="reveal">スキル全一覧 (1/3)</h2>
+        <table class="slide-table reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <tr><th>スキル</th><th>説明</th></tr>
+            <tr><td><code>/office-hours</code></td><td>初期インタビュー / リフレーミング</td></tr>
+            <tr><td><code>/plan-ceo-review</code></td><td>founder視点での再設計</td></tr>
+            <tr><td><code>/plan-eng-review</code></td><td>アーキテクチャ、データフロー、テスト計画</td></tr>
+            <tr><td><code>/plan-design-review</code></td><td>デザイン完成度チェック</td></tr>
+            <tr><td><code>/design-consultation</code></td><td>デザインシステム設計</td></tr>
+            <tr><td><code>/review</code></td><td>構造的バグの偏執的レビュー</td></tr>
+            <tr><td><code>/investigate</code></td><td>推測禁止、原因優先デバッグ</td></tr>
+        </table>
+    </div>
+</section>
+
+
+<!-- SLIDE 31: スキル全一覧 2 -->
+<section class="slide content-slide" data-slide="30">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">5-12</p>
+        <h2 class="reveal">スキル全一覧 (2/3)</h2>
+        <table class="slide-table reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <tr><th>スキル</th><th>説明</th></tr>
+            <tr><td><code>/design-review</code></td><td>ライブサイトの視覚的監査</td></tr>
+            <tr><td><code>/qa</code></td><td>ブラウザベースQA + 回帰テスト</td></tr>
+            <tr><td><code>/qa-only</code></td><td>修正なしでバグレポートのみ</td></tr>
+            <tr><td><code>/ship</code></td><td>テスト → PR → リリース締め</td></tr>
+            <tr><td><code>/document-release</code></td><td>コード変更に合わせてドキュメント同期</td></tr>
+            <tr><td><code>/retro</code></td><td>週次振り返り + メトリクス分析</td></tr>
+            <tr><td><code>/browse</code></td><td>高速persistent browser automation</td></tr>
+        </table>
+    </div>
+</section>
+
+
+<!-- SLIDE 32: スキル全一覧 3 -->
+<section class="slide content-slide" data-slide="31">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">5-13</p>
+        <h2 class="reveal">スキル全一覧 (3/3)</h2>
+        <table class="slide-table reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <tr><th>スキル</th><th>説明</th></tr>
+            <tr><td><code>/setup-browser-cookies</code></td><td>実ブラウザのCookieでセッション再利用</td></tr>
+            <tr><td><code>/codex</code></td><td>Codex CLIによる2次独立レビュー</td></tr>
+            <tr><td><code>/careful</code></td><td>破壊的コマンドの警告</td></tr>
+            <tr><td><code>/freeze</code></td><td>特定ディレクトリ外の編集制限</td></tr>
+            <tr><td><code>/guard</code></td><td>careful + freeze</td></tr>
+            <tr><td><code>/unfreeze</code></td><td>freeze解除</td></tr>
+            <tr><td><code>/gstack-upgrade</code></td><td>インストール場所を検知してアップグレード</td></tr>
+            <tr><td><code>/find-skills</code></td><td>新しいスキルの検索 & インストール</td></tr>
+        </table>
+    </div>
+</section>
+
+
+<!-- SLIDE 33: カテゴリ別 — 企画 -->
+<section class="slide content-slide" data-slide="32">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">5-14</p>
+        <h2 class="reveal">カテゴリ: アイデア & 企画</h2>
+        <table class="slide-table reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <tr><th>スキル</th><th>用途</th></tr>
+            <tr><td><code>/office-hours</code></td><td>ブレインストーミング、「作る価値があるか？」の判断</td></tr>
+            <tr><td><code>/plan-ceo-review</code></td><td>戦略視点のプランレビュー（スコープ拡大/縮小）</td></tr>
+            <tr><td><code>/plan-eng-review</code></td><td>アーキテクチャ/エンジニアリング視点のレビュー</td></tr>
+            <tr><td><code>/plan-design-review</code></td><td>デザイン/UX視点のレビュー</td></tr>
+        </table>
+    </div>
+</section>
+
+
+<!-- SLIDE 34: カテゴリ別 — デザイン、開発、コードレビュー -->
+<section class="slide content-slide" data-slide="33">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">5-15</p>
+        <h2 class="reveal">カテゴリ: デザイン・開発・レビュー</h2>
+        <div class="two-col reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <div>
+                <h3 style="font-size:var(--body-size); margin-bottom:0.3rem;">デザイン & UI</h3>
+                <ul class="bullets"><li>/design-consultation — デザインシステム作成</li><li>/design-review — 視覚的QA</li></ul>
+            </div>
+            <div>
+                <h3 style="font-size:var(--body-size); margin-bottom:0.3rem;">開発 & デバッグ</h3>
+                <ul class="bullets"><li>/investigate — 根本原因の特定</li><li>/browse — ヘッドレスブラウザテスト</li></ul>
+            </div>
+            <div>
+                <h3 style="font-size:var(--body-size); margin-bottom:0.3rem;">コードレビュー & デプロイ</h3>
+                <ul class="bullets"><li>/review — PRコードレビュー</li><li>/codex — セカンドオピニオン</li><li>/ship — ワンストップデプロイ</li></ul>
+            </div>
+            <div>
+                <h3 style="font-size:var(--body-size); margin-bottom:0.3rem;">テスト & QA</h3>
+                <ul class="bullets"><li>/qa — QA + 自動修正</li><li>/qa-only — レポートのみ</li></ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 35: カテゴリ別 — セーフティ & その他 -->
+<section class="slide content-slide" data-slide="34">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">5-16</p>
+        <h2 class="reveal">カテゴリ: セーフティモード & その他</h2>
+        <div class="two-col reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <div>
+                <h3 style="font-size:var(--body-size); margin-bottom:0.3rem;">セーフティモード</h3>
+                <ul class="bullets"><li>/careful — 危険コマンドの警告</li><li>/freeze — ディレクトリ編集制限</li><li>/guard — careful + freeze（最大安全）</li><li>/unfreeze — freeze解除</li></ul>
+            </div>
+            <div>
+                <h3 style="font-size:var(--body-size); margin-bottom:0.3rem;">その他</h3>
+                <ul class="bullets"><li>/retro — 週次振り返り</li><li>/document-release — デプロイ後のドキュメント</li><li>/setup-browser-cookies — Cookieインポート</li><li>/find-skills — スキル検索</li></ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 36: /browse 使い方 -->
+<section class="slide content-slide" data-slide="35">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">5-17</p>
+        <h2 class="reveal">/browse クイック使用法</h2>
+        <div class="code-block reveal" style="position:relative; margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <span class="code-lang">bash</span>
+            <code><span class="cmt"># ページを開く</span>
+$B goto https://example.com
+<span class="cmt"># インタラクティブ要素の確認</span>
+$B snapshot -i
+<span class="cmt"># クリック/入力</span>
+$B click @e3
+$B fill @e4 <span class="str">"値"</span>
+<span class="cmt"># diff / スクリーンショット / レスポンシブ</span>
+$B snapshot -D
+$B screenshot /tmp/result.png
+$B responsive /tmp/layout</code>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 37: 制限事項と注意点 -->
+<section class="slide content-slide" data-slide="36">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">5-18</p>
+        <h2 class="reveal">制限事項と注意点</h2>
+        <ul class="bullets reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <li><strong>強くopinionated</strong> — Garry Tan式の開発文化と合わなければ窮屈に感じることがある</li>
+            <li>コアロジックの大部分がprompt/skill markdown → 「エンジン」より「運用ルール」の比重が大きい</li>
+            <li>Cookie復号化は<strong>macOS Keychain中心</strong>（Windows/Linux未実装）</li>
+            <li><strong>iframeサポートなし</strong>（most-requested missing feature）</li>
+            <li>非Claudeホストでは/carefulなどがadvisory proseとして弱くなる</li>
+            <li>telemetryはopt-inだが存在 — スキル名、時間、結果、バージョン、OSを収集</li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- SLIDE 38: gstack 結論 -->
+<section class="slide content-slide" data-slide="37">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">5-19</p>
+        <h2 class="reveal">gstack 結論</h2>
+        <div class="highlight-box reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <p>gstackは「AIがより賢くなるツール」ではなく<strong>「AIをチームのように運用する方式」</strong>である。</p>
+        </div>
+        <ul class="bullets reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <li>最大の改善はモデルではなく<strong>運用構造</strong></li>
+            <li>企画再定義 → レビュー/QA/ドキュメント/リリースをスキルに分割 → ブラウザ → 並列スプリント</li>
+            <li>自由度の高い汎用エージェントよりは<strong>強いプロセスと役割分離が必要な創業者/テックリード/一人開発者</strong>に適している</li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- ====================================================
+     SLIDE 39: SECTION — 6. CLAUDE.md / AGENTS.md 設定
+     ==================================================== -->
+<section class="slide section-slide" id="sec-6" data-slide="38">
+    <div class="grid-bg-dark"></div>
+    <div class="slide-content" style="align-items:center; text-align:center;">
+        <p class="label reveal" style="color:var(--accent-light);">Section 06</p>
+        <h1 class="reveal" style="color:#fff;">CLAUDE.md<br>AGENTS.md 設定</h1>
+    </div>
+    <div class="section-number section-number-dark">06</div>
+</section>
+
+
+
+
+<!-- SLIDE 41: 推奨 CLAUDE.md / AGENTS.md 構成 -->
+<section class="slide content-slide" data-slide="40">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">6-1</p>
+        <h2 class="reveal">推奨 CLAUDE.md / AGENTS.md 構成</h2>
+        <ul class="bullets reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <li><strong>Andrej Karpathyの簡潔なCLAUDE.md</strong>をメインとして使用</li>
+            <li>4つの核心原則: Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution</li>
+            <li>Gstack指示を追加</li>
+            <li>サブエージェントモード指示を追加</li>
+            <li>RTK指示（<code>@RTK.md</code>参照）を追加</li>
+            <li>RTKは現在Claude Codeでのみ動作するため、RTK.mdを除けば<code>~/.codex/AGENTS.md</code>も同一構成で問題ありません</li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- SLIDE: Why Karpathy's CLAUDE.md Went Viral -->
+<section class="slide content-slide" data-slide="41">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">6-1+</p>
+        <h2 class="reveal">KarpathyのCLAUDE.mdはなぜ話題になったのか</h2>
+        <ul class="bullets reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <li><strong>たった4つの原則</strong>でAIコーディングエージェントの慢性的な問題（過剰設計、不要なリファクタリング、推測的なコード）を正面から狙い撃ち</li>
+            <li>「シニアエンジニアが見て複雑すぎると言うか？ならシンプルに書き直せ」— この一文が開発者コミュニティで爆発的に拡散</li>
+            <li>長く冗長だった従来のCLAUDE.mdに比べ、<strong>短く具体的な行動指針</strong>だけで実際のコード品質が目に見えて向上</li>
+            <li>AIに「どうコーディングするか」ではなく<strong>「やるべきでないこと」</strong>を明確にした逆転の発想が核心</li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- SLIDE 42: Think Before Coding -->
+<section class="slide content-slide" data-slide="41">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">6-2</p>
+        <h2 class="reveal">Karpathyの原則 1: Think Before Coding</h2>
+        <h3 class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem); font-size:var(--body-size);">仮定するな、混乱を隠すな、トレードオフを明らかにせよ。</h3>
+        <ul class="bullets reveal" style="margin-top:clamp(0.4rem,0.8vw,0.6rem);">
+            <li>仮定を明示的に示す。不確かなら質問する。</li>
+            <li>解釈が複数あればすべて提示 — 黙って一つだけ選ばない</li>
+            <li>よりシンプルな方法があれば言う。必要なら反論する。</li>
+            <li>不明確なら止まって、何が分からないか名前を付ける。</li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- SLIDE 43: Simplicity First -->
+<section class="slide content-slide" data-slide="42">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">6-3</p>
+        <h2 class="reveal">Karpathyの原則 2: Simplicity First</h2>
+        <h3 class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem); font-size:var(--body-size);">問題を解決する最小限のコード。推測的コードは書かない。</h3>
+        <ul class="bullets reveal" style="margin-top:clamp(0.4rem,0.8vw,0.6rem);">
+            <li>要求範囲を超える機能なし</li>
+            <li>単一使用コードに抽象化なし</li>
+            <li>要求されていない「柔軟性」や「設定可能性」なし</li>
+            <li>ありえないシナリオに対するエラーハンドリングなし</li>
+            <li>200行が50行にできるなら書き直す</li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- SLIDE 44: Surgical Changes -->
+<section class="slide content-slide" data-slide="43">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">6-4</p>
+        <h2 class="reveal">Karpathyの原則 3: Surgical Changes</h2>
+        <h3 class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem); font-size:var(--body-size);">必要なものだけ触り、自分が作ったものだけ片付ける。</h3>
+        <ul class="bullets reveal" style="margin-top:clamp(0.4rem,0.8vw,0.6rem);">
+            <li>隣接コード、コメント、フォーマットを「改善」しない</li>
+            <li>壊れていないものをリファクタリングしない</li>
+            <li>既存スタイルに合わせる（自分の好みが違っても）</li>
+            <li>自分の変更で生まれた孤立コードだけ削除。既存のdead codeは言及のみ。</li>
+        </ul>
+        <div class="highlight-box reveal" style="margin-top:clamp(0.4rem,0.8vw,0.6rem);">
+            <p>テスト: <strong>変更されたすべての行がユーザーの要求に直接関連</strong>していなければならない。</p>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 45: Goal-Driven Execution -->
+<section class="slide content-slide" data-slide="44">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">6-5</p>
+        <h2 class="reveal">Karpathyの原則 4: Goal-Driven Execution</h2>
+        <h3 class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem); font-size:var(--body-size);">成功基準を定義し、検証されるまで繰り返す。</h3>
+        <ul class="bullets reveal" style="margin-top:clamp(0.4rem,0.8vw,0.6rem);">
+            <li>「バリデーション追加」→「不正入力のテストを書いてパスさせる」</li>
+            <li>「バグ修正」→「再現テストを書いてパスさせる」</li>
+            <li>「Xリファクタリング」→「前後でテストがパスすることを確認」</li>
+        </ul>
+        <div class="code-block reveal" style="margin-top:clamp(0.4rem,0.8vw,0.6rem);"><code>1. [ステップ] → 検証: [チェック]
+2. [ステップ] → 検証: [チェック]
+3. [ステップ] → 検証: [チェック]</code></div>
+    </div>
+</section>
+
+
+<!-- SLIDE: Gstack Directive in CLAUDE.md -->
+<section class="slide content-slide" data-slide="45">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">6-6</p>
+        <h2 class="reveal">CLAUDE.md &amp; AGENTS.mdに追加するgstack指示</h2>
+        <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">gstack GitHub README.mdに記載されている内容をそのままCLAUDE.md &amp; AGENTS.mdの下部に追加します。</p>
+        <div class="code-block reveal" style="position:relative; margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <span class="code-lang">markdown</span>
+            <code><span class="comment"># Gstack</span>
+To use the /browse skill from gstack for all web browsing,
+never use mcp__claude-in-chrome__* tools, and lists the
+available skills: /office-hours, /plan-ceo-review,
+/plan-eng-review, /plan-design-review, /design-consultation,
+/review, /ship, /browse, /qa, /qa-only, /design-review,
+/setup-browser-cookies, /retro, /investigate,
+/document-release, /codex, /careful, /freeze, /guard,
+/unfreeze, /gstack-upgrade.</code>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE: Subagent Directive in CLAUDE.md -->
+<section class="slide content-slide" data-slide="46">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">6-7</p>
+        <h2 class="reveal">サブエージェント指示</h2>
+        <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">計画が完成したPRDをもとにRalphで実装する方法もありますが、サブエージェントで実装する方法もあります。この場合のために、サブエージェント指示も以下のように追加します。</p>
+        <div class="code-block reveal" style="position:relative; margin-top:clamp(0.5rem,1vw,0.8rem); font-size:clamp(0.55rem, 0.9vw, 0.8rem);">
+            <span class="code-lang">markdown</span>
+            <code><span class="comment"># Subagent-Based Workflow</span>
+
+<span class="keyword">**Load skills**</span>: `superpowers:executing-plans`,
+  `superpowers:dispatching-parallel-agents`
+
+<span class="comment">## Principle</span>
+The main context should be handled only by the orchestrator.
+All implementation and review work should be delegated to subagents.
+
+<span class="comment">## Task Loop</span>
+| Step | Owner | Description |
+| 1. Planning | Opus 4.6 subagent | Create implementation plan |
+| 2. Implementation | Sonnet 4.6 subagent | Write code |
+| 3. Review | Opus 4.6 subagent | Run /simplify &amp; fix |
+| 4. Commit | Main | Commit &amp; mark complete |</code>
+        </div>
+        <p class="reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">gstackで生成したプラン文書に対して、次のようにプロンプトを入力:</p>
+        <div class="code-block reveal" style="position:relative; margin-top:clamp(0.3rem,0.6vw,0.5rem);">
+            <code>{プラン文書パス} を서브에이전트 기반으로 작업해줘.</code>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE: Final CLAUDE.md & AGENTS.md -->
+<section class="slide content-slide" data-slide="47">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">6-8</p>
+        <h2 class="reveal">最終的な CLAUDE.md &amp; AGENTS.md 全体構造</h2>
+        <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">CLAUDE.mdのみ最終行に <code>@RTK.md</code> が追加されます。</p>
+        <div class="code-block reveal" style="position:relative; margin-top:clamp(0.4rem,0.8vw,0.6rem); font-size:clamp(0.45rem, 0.7vw, 0.65rem); max-height:75vh; overflow-y:auto;">
+            <span class="code-lang">markdown</span>
+            <code><span class="comment"># CLAUDE.md</span>
+
+Behavioral guidelines to reduce common LLM coding mistakes.
+Merge with project-specific instructions as needed.
+
+<span class="keyword">**Tradeoff:**</span> These guidelines bias toward caution over speed.
+For trivial tasks, use judgment.
+
+<span class="comment">## 1. Think Before Coding</span>
+<span class="keyword">**Don't assume. Don't hide confusion. Surface tradeoffs.**</span>
+- State your assumptions explicitly. If uncertain, ask.
+- If multiple interpretations exist, present them - don't pick silently.
+- If a simpler approach exists, say so. Push back when warranted.
+- If something is unclear, stop. Name what's confusing. Ask.
+
+<span class="comment">## 2. Simplicity First</span>
+<span class="keyword">**Minimum code that solves the problem. Nothing speculative.**</span>
+- No features beyond what was asked.
+- No abstractions for single-use code.
+- No "flexibility" or "configurability" that wasn't requested.
+- If you write 200 lines and it could be 50, rewrite it.
+
+<span class="comment">## 3. Surgical Changes</span>
+<span class="keyword">**Touch only what you must. Clean up only your own mess.**</span>
+- Don't "improve" adjacent code, comments, or formatting.
+- Don't refactor things that aren't broken.
+- Match existing style, even if you'd do it differently.
+- Remove imports/variables/functions that YOUR changes made unused.
+
+<span class="comment">## 4. Goal-Driven Execution</span>
+<span class="keyword">**Define success criteria. Loop until verified.**</span>
+- "Add validation" → "Write tests for invalid inputs, then make them pass"
+- "Fix the bug" → "Write a test that reproduces it, then make it pass"
+- "Refactor X" → "Ensure tests pass before and after"
+
+---
+
+<span class="comment"># Gstack</span>
+To use the /browse skill from gstack for all web browsing,
+never use mcp__claude-in-chrome__* tools, and lists the
+available skills: /office-hours, /plan-ceo-review, ...
+
+<span class="comment"># Subagent-Based Workflow</span>
+<span class="keyword">**Load skills**</span>: `superpowers:executing-plans`,
+  `superpowers:dispatching-parallel-agents`
+
+<span class="comment">## Principle</span>
+The main context → orchestrator only. Implementation → subagents.
+
+<span class="comment">## Task Loop</span>
+| Step | Owner | Description |
+| 1. Planning | Opus 4.6 | Create implementation plan |
+| 2. Implementation | Sonnet 4.6 | Write code |
+| 3. Review | Opus 4.6 | Run /simplify &amp; fix |
+| 4. Commit | Main | Commit &amp; mark complete |
+
+<span class="str">@RTK.md</span>  <span class="comment">← CLAUDE.md only (not in AGENTS.md)</span></code>
+        </div>
+    </div>
+</section>
+
+
+<!-- ====================================================
+     SLIDE 46: SECTION — 7. 実践例
+     ==================================================== -->
+<section class="slide section-slide" id="sec-7" data-slide="45">
+    <div class="grid-bg-dark"></div>
+    <div class="slide-content" style="align-items:center; text-align:center;">
+        <p class="label reveal" style="color:var(--accent-light);">Section 07</p>
+        <h1 class="reveal" style="color:#fff;">実践例</h1>
+        <p class="subtitle reveal" style="color:rgba(255,255,255,0.5); margin-top:0.8rem;">gstack + RalphでTodo Webアプリを作る</p>
+    </div>
+    <div class="section-number section-number-dark">07</div>
+</section>
+
+
+<!-- SLIDE 47: Step 1 office-hours -->
+<section class="slide content-slide" data-slide="46">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">Step 1</p>
+        <h2 class="reveal">アイデア整理 — /office-hours</h2>
+        <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">Claudeがソクラテス式の質問を投げかける:</p>
+        <ul class="bullets reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">
+            <li>「なぜこれを作りたいのですか？既存のTodoアプリと何が違いますか？」</li>
+            <li>「ターゲットユーザーは誰ですか？」</li>
+            <li>「最も狭いエントリーポイント（wedge）は何ですか？」</li>
+        </ul>
+        <div class="highlight-box reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <p>アイデア具体化 → <strong>「開発者向けのCLI-first Todoアプリ。Webダッシュボードは閲覧用。」</strong></p>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 48: Step 2 ceo-review -->
+<section class="slide content-slide" data-slide="47">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">Step 2</p>
+        <h2 class="reveal">戦略レビュー — /plan-ceo-review</h2>
+        <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">CEO/founder視点でプランを点検:</p>
+        <ul class="bullets reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">
+            <li>「ダッシュボードは本当に必要か？CLIだけで十分ではないか？」</li>
+            <li>「スコープを縮小してMVPをもっと早く出す方がいいのでは？」</li>
+        </ul>
+        <div class="highlight-box reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <p>決定: <strong>Phase 1はWeb CRUDのみ。CLIはPhase 2へ。</strong></p>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 49: Step 3 eng-review -->
+<section class="slide content-slide" data-slide="48">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">Step 3</p>
+        <h2 class="reveal">エンジニアリングレビュー — /plan-eng-review</h2>
+        <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">アーキテクチャを固める:</p>
+        <ul class="bullets reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">
+            <li>スタック: Next.js 15 (App Router) + Prisma + SQLite</li>
+            <li>モデル: <code>Todo { id, title, completed, createdAt, updatedAt }</code></li>
+            <li>API: <code>/api/todos</code> (GET, POST, PUT, DELETE)</li>
+            <li>テスト: Vitest + Playwright E2E</li>
+            <li>エッジケース: 空のタイトル、重複、同時編集</li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- SLIDE 50: Step 4 design -->
+<section class="slide content-slide" data-slide="49">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">Step 4</p>
+        <h2 class="reveal">デザインシステム — /design-consultation</h2>
+        <ul class="bullets reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <li>ミニマルなデザインシステムを生成</li>
+            <li>カラーパレット、タイポグラフィ、スペーシングルール</li>
+            <li>成果物: <code>DESIGN.md</code> + フォント/カラープレビューページ</li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- SLIDE 51: Step 5 Ralph ループ -->
+<section class="slide content-slide" data-slide="50">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">Step 5</p>
+        <h2 class="reveal">実装 — Ralphループで自動化</h2>
+        <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">gstackの領域を超えて<strong>Ralph</strong>が登場。プランが確定したので実装をRalphループに任せる。</p>
+        <div class="code-block reveal" style="position:relative; margin-top:clamp(0.4rem,0.8vw,0.6rem);">
+            <code>/ralph-loop <span class="str">"
+Phase 1: プロジェクト初期化 (Next.js + Prisma)
+Phase 2: API実装 (/api/todos CRUD)
+Phase 3: UI実装 (DESIGN.mdに従うこと)
+Phase 4: テスト (Vitest + Playwright, カバレッジ80%+)
+"</span> --completion-promise <span class="str">"COMPLETE"</span> --max-iterations 30</code>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 52: Ralphがやること -->
+<section class="slide content-slide" data-slide="51">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">Step 5 (続き)</p>
+        <h2 class="reveal">Ralphがやること</h2>
+        <ol class="reveal" style="padding-left:1.5em; margin-top:clamp(0.5rem,1vw,0.8rem); list-style:decimal;">
+            <li>Phase 1～4を順番に実装</li>
+            <li>テスト実行 → 失敗したら原因分析後に修正</li>
+            <li>再テスト → 繰り返し</li>
+            <li>すべてのテストがパスしたら<code>COMPLETE</code>を出力 → ループ終了</li>
+        </ol>
+        <div class="highlight-box reveal" style="margin-top:clamp(0.6rem,1vw,1rem);">
+            <p>人の介入は不要。<strong>夜に実行して朝に結果を確認すればよい。</strong></p>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 53: Step 6-7 Review + Codex -->
+<section class="slide content-slide" data-slide="52">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">Step 6–7</p>
+        <h2 class="reveal">コードレビュー & セカンドオピニオン</h2>
+        <div class="two-col reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <div>
+                <h3 style="font-size:var(--body-size); margin-bottom:0.3rem;">/review</h3>
+                <ul class="bullets"><li>SQL安全性、信頼境界違反、条件付き副作用の構造的チェック</li><li>発見された問題の修正</li></ul>
+            </div>
+            <div>
+                <h3 style="font-size:var(--body-size); margin-bottom:0.3rem;">/codex review</h3>
+                <ul class="bullets"><li>OpenAI Codexが独立してdiffレビュー</li><li>pass/failゲートの役割</li></ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 54: Step 8-9 QA + Design Review -->
+<section class="slide content-slide" data-slide="53">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">Step 8–9</p>
+        <h2 class="reveal">QAテスト & デザイン監査</h2>
+        <div class="two-col reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <div>
+                <h3 style="font-size:var(--body-size); margin-bottom:0.3rem;">/qa</h3>
+                <ul class="bullets"><li>実際のブラウザでTodoの追加/削除/完了をクリック</li><li>壊れたUI、欠落したエラー処理の発見</li><li>バグ → 自動修正 → 再検証 → コミット</li></ul>
+            </div>
+            <div>
+                <h3 style="font-size:var(--body-size); margin-bottom:0.3rem;">/design-review</h3>
+                <ul class="bullets"><li>ライブサイトのスクリーンショットキャプチャ</li><li>スペーシング、フォント、AIスロップパターンのチェック</li><li>視覚的問題をソースから直接修正</li></ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 55: Step 10-11 Ship + Docs -->
+<section class="slide content-slide" data-slide="54">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">Step 10–11</p>
+        <h2 class="reveal">デプロイ & ドキュメント同期</h2>
+        <div class="two-col reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <div>
+                <h3 style="font-size:var(--body-size); margin-bottom:0.3rem;">/ship</h3>
+                <ul class="bullets"><li>ベースブランチへのマージ</li><li>テスト再実行（パス確認）</li><li>diffレビュー + VERSIONバンプ</li><li>CHANGELOG → コミット → プッシュ → PR</li></ul>
+            </div>
+            <div>
+                <h3 style="font-size:var(--body-size); margin-bottom:0.3rem;">/document-release</h3>
+                <ul class="bullets"><li>READMEと実際のコードの一致確認</li><li>APIドキュメント、CONTRIBUTINGの更新</li><li>TODOSの整理</li></ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 56: Step 12 Retro -->
+<section class="slide content-slide" data-slide="55">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">Step 12</p>
+        <h2 class="reveal">振り返り — /retro</h2>
+        <ul class="bullets reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <li>今回のスプリントのコミット分析</li>
+            <li>コード品質メトリクス</li>
+            <li>Ralphループの繰り返し回数、どこで最も詰まったかの確認</li>
+            <li>次のスプリントの改善点を導出</li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- SLIDE 57: 全体フロー要約 -->
+<section class="slide content-slide" data-slide="56">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">Summary</p>
+        <h2 class="reveal">全体フロー要約</h2>
+        <div class="flow reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <span class="flow-item">/office-hours</span><span class="flow-arrow">→</span>
+            <span class="flow-item">/plan-ceo-review</span><span class="flow-arrow">→</span>
+            <span class="flow-item">/plan-eng-review</span>
+        </div>
+        <div class="flow reveal" style="margin-top:0.3rem;">
+            <span class="flow-arrow">→</span>
+            <span class="flow-item">/design-consultation</span><span class="flow-arrow">→</span>
+            <span class="flow-item" style="background:var(--accent);color:#fff;">/ralph-loop &#10227;</span>
+        </div>
+        <div class="flow reveal" style="margin-top:0.3rem;">
+            <span class="flow-arrow">→</span>
+            <span class="flow-item">/review</span><span class="flow-arrow">→</span>
+            <span class="flow-item">/codex</span><span class="flow-arrow">→</span>
+            <span class="flow-item">/qa</span><span class="flow-arrow">→</span>
+            <span class="flow-item">/design-review</span>
+        </div>
+        <div class="flow reveal" style="margin-top:0.3rem;">
+            <span class="flow-arrow">→</span>
+            <span class="flow-item">/ship</span><span class="flow-arrow">→</span>
+            <span class="flow-item">/document-release</span><span class="flow-arrow">→</span>
+            <span class="flow-item">/retro</span>
+        </div>
+        <div class="highlight-box reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <p><strong>gstack</strong>がプロセスの骨格、<strong>Ralph</strong>が自動反復ループ。一人開発者がチームレベルの品質ゲートを維持しながら実装を自動化する核心的な組み合わせ。</p>
+        </div>
+    </div>
+</section>
+
+
+<!-- ====================================================
+     SLIDE 58: SECTION — Appendix
+     ==================================================== -->
+<section class="slide section-slide" id="sec-a" data-slide="57">
+    <div class="grid-bg-dark"></div>
+    <div class="slide-content" style="align-items:center; text-align:center;">
+        <p class="label reveal" style="color:var(--accent-light);">Appendix</p>
+        <h1 class="reveal" style="color:#fff;">Claude Code<br>内部構造</h1>
+    </div>
+    <div class="section-number section-number-dark">A</div>
+</section>
+
+
+<!-- SLIDE 59: .claude 運用階層 -->
+<section class="slide content-slide" data-slide="58">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">A.1</p>
+        <h2 class="reveal">.claudeは単なる設定フォルダではない</h2>
+        <table class="slide-table reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <tr><th>ディレクトリ</th><th>役割</th></tr>
+            <tr><td><code>commands/</code></td><td>ワークフローのエントリーポイント</td></tr>
+            <tr><td><code>agents/</code></td><td>隔離された役割ベースのワーカー</td></tr>
+            <tr><td><code>skills/</code></td><td>再利用可能な知識/手順</td></tr>
+            <tr><td><code>hooks/</code></td><td>イベント駆動の自動化</td></tr>
+            <tr><td><code>rules/</code></td><td>コンテキスト注入の詳細ルール</td></tr>
+            <tr><td><code>settings.json</code></td><td>権限・UI・フック・MCPの全体制御</td></tr>
+            <tr><td><code>agent-memory/</code></td><td>エージェント永続メモリ</td></tr>
+        </table>
+    </div>
+</section>
+
+
+<!-- SLIDE 60: 核心設計哲学 -->
+<section class="slide content-slide" data-slide="59">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">A.2</p>
+        <h2 class="reveal">核心設計哲学</h2>
+        <div class="highlight-box reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <p><strong>Command</strong>がフローをオーケストレーションし、<strong>Agent</strong>が独立して作業し、<strong>Skill</strong>が知識/手順を再利用し、<strong>Hook</strong>が外部から自動化を掛ける。</p>
+        </div>
+        <ul class="bullets reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <li>一緒に見るべきルートファイル: <code>CLAUDE.md</code> + <code>.mcp.json</code></li>
+            <li><code>.claude</code>だけ見ると半分しか見えない</li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- SLIDE 61: commands/ -->
+<section class="slide content-slide" data-slide="60">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">A.3</p>
+        <h2 class="reveal">commands/ — ワークフローコントローラ</h2>
+        <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">複雑な作業を一つのagentに詰め込まない:</p>
+        <ol class="reveal" style="padding-left:1.5em; margin-top:clamp(0.3rem,0.6vw,0.5rem); list-style:decimal;">
+            <li><strong>Command</strong>がフローを定義</li>
+            <li><strong>Agent</strong>が独立作業を処理</li>
+            <li><strong>Skill</strong>が再利用可能な手順を担当</li>
+        </ol>
+        <ul class="bullets reveal" style="margin-top:clamp(0.4rem,0.8vw,0.6rem);">
+            <li>フローが見え、ユーザー確認ステップを入れやすい</li>
+            <li>一つの役割が肥大化せず、再利用しやすくなる</li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- SLIDE 62: agents/ -->
+<section class="slide content-slide" data-slide="61">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">A.4</p>
+        <h2 class="reveal">agents/ — 役割ベースのワーカー</h2>
+        <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">「fresh isolated context」を持つ独立アクター。</p>
+        <table class="slide-table reveal" style="margin-top:clamp(0.4rem,0.8vw,0.6rem);">
+            <tr><th>フィールド</th><th>説明</th></tr>
+            <tr><td><code>name</code> / <code>description</code></td><td>識別子 / いつ使うべきか</td></tr>
+            <tr><td><code>allowedTools</code> / <code>model</code></td><td>ツール範囲 / haiku・sonnet・opus・inherit</td></tr>
+            <tr><td><code>maxTurns</code> / <code>skills</code></td><td>最大ターン / preloadするスキル</td></tr>
+            <tr><td><code>memory</code> / <code>isolation</code></td><td>user・project・local / worktree</td></tr>
+        </table>
+        <div class="highlight-box reveal" style="margin-top:clamp(0.4rem,0.8vw,0.6rem);">
+            <p>大きな万能agent一つよりも、<strong>小さな役割専用agentを複数持つ方が良い。</strong></p>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 63: skills/ -->
+<section class="slide content-slide" data-slide="62">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">A.5</p>
+        <h2 class="reveal">skills/ — 再利用可能な知識/手順</h2>
+        <div class="two-col reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <div>
+                <h3 style="font-size:var(--body-size); margin-bottom:0.3rem;">A. 直接呼び出し</h3>
+                <p>commandまたはユーザーによって呼び出し。現在のコンテキストで動作。共通手順の再利用に最適。</p>
+            </div>
+            <div>
+                <h3 style="font-size:var(--body-size); margin-bottom:0.3rem;">B. Agent preload</h3>
+                <p>agentの<code>skills:</code>に入れて開始時に注入。「このagentが知っておくべき作業知識」。<code>user-invocable: false</code>でメニュー非表示が可能。</p>
+            </div>
+        </div>
+        <div class="highlight-box reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <p>descriptionは初期コンテキストに入り、全内容は呼び出し時のみロード。長い説明は<strong>context budget</strong>を消費するだけ。</p>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 64: hooks/ -->
+<section class="slide content-slide" data-slide="63">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">A.6</p>
+        <h2 class="reveal">hooks/ — イベント駆動の自動化</h2>
+        <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">Agentic loopの<strong>中ではなく外</strong>で実行。</p>
+        <table class="slide-table reveal" style="margin-top:clamp(0.4rem,0.8vw,0.6rem);">
+            <tr><th>イベント</th><th>タイミング</th></tr>
+            <tr><td>PreToolUse / PostToolUse</td><td>ツール使用の直前/直後</td></tr>
+            <tr><td>SessionStart / SessionEnd</td><td>セッション開始/終了</td></tr>
+            <tr><td>SubagentStart / SubagentStop</td><td>サブエージェント</td></tr>
+            <tr><td>TaskCompleted / WorktreeCreate</td><td>タスク完了 / ワークツリー作成</td></tr>
+        </table>
+        <p class="reveal" style="margin-top:clamp(0.4rem,0.8vw,0.6rem); font-size:var(--small-size);">このリポジトリは<code>hooks.py</code>一つにまとめて設定ファイルでon/off — デプロイ・共有がシンプル。</p>
+    </div>
+</section>
+
+
+<!-- SLIDE 65: rules/ + settings.json -->
+<section class="slide content-slide" data-slide="64">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">A.7</p>
+        <h2 class="reveal">rules/ & settings.json</h2>
+        <div class="two-col reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <div>
+                <h3 style="font-size:var(--body-size); margin-bottom:0.3rem;">rules/ — モジュール化されたルール</h3>
+                <ul class="bullets"><li>CLAUDE.mdにすべて詰め込まない</li><li>特定ファイル群にのみ適用されるルールを分離</li><li>CLAUDE.mdを短く維持可能</li></ul>
+            </div>
+            <div>
+                <h3 style="font-size:var(--body-size); margin-bottom:0.3rem;">settings.json — 全体制御</h3>
+                <ul class="bullets"><li>権限 allow/ask/deny</li><li>plansDirectory、環境変数、フック</li><li>MCP auto-approval</li><li>「利便性と安全性を両方とも構造で管理」</li></ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 66: agent-memory/ -->
+<section class="slide content-slide" data-slide="65">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">A.8</p>
+        <h2 class="reveal">agent-memory/ — 動的知識の蓄積</h2>
+        <table class="slide-table reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <tr><th>モード</th><th>範囲</th></tr>
+            <tr><td><code>memory: project</code></td><td>チーム共有資産</td></tr>
+            <tr><td><code>memory: user</code></td><td>ユーザー全体の記憶</td></tr>
+            <tr><td><code>memory: local</code></td><td>個人的、gitに入らない記憶</td></tr>
+        </table>
+        <div class="highlight-box reveal" style="margin-top:clamp(0.6rem,1vw,1rem);">
+            <p><strong>Skill</strong> = 開始時に注入される静的な<em>設計知識</em><br>
+            <strong>Memory</strong> = 作業しながら蓄積される動的な<em>運用知識</em><br>
+            この2つを組み合わせて使うのが実践パターン。</p>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 67: Command vs Agent vs Skill -->
+<section class="slide content-slide" data-slide="66">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">A.9</p>
+        <h2 class="reveal">Command vs Agent vs Skill</h2>
+        <table class="slide-table reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <tr><th>項目</th><th>いつ使うか</th><th>コンテキスト</th><th>適した役割</th></tr>
+            <tr><td><strong>Command</strong></td><td>ユーザーが直接開始</td><td>現在のセッション</td><td>エントリーポイント、順序制御</td></tr>
+            <tr><td><strong>Agent</strong></td><td>独立した役割が必要</td><td>新規/隔離</td><td>調査、実装、レビュー</td></tr>
+            <tr><td><strong>Skill</strong></td><td>再利用知識/手順</td><td>現在/preload</td><td>共通作業ルール</td></tr>
+        </table>
+        <div class="highlight-box reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <p>起点 → command・役割分離 → agent・再利用マニュアル → skill</p>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 68: 分離基準 + アーキテクチャパターン -->
+<section class="slide content-slide" data-slide="67">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">A.10</p>
+        <h2 class="reveal">分離基準 & アーキテクチャパターン</h2>
+        <ul class="bullets reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <li><code>CLAUDE.md</code> = 上位原則 / <code>rules/</code> = 狭い範囲のルール</li>
+            <li>Skill = 「最初から知っていること」 / Memory = 「やりながら学んだこと」</li>
+            <li><code>settings.json</code> = Claude動作制御 / <code>.mcp.json</code> = 外部サーバー接続</li>
+        </ul>
+        <div class="highlight-box reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <p>代表パターン: <strong>Command → Agent (with preloaded skill) → Skill</strong><br>
+            例: /weather-orchestrator → weather-agent(weather-fetcher preload) → weather-svg-creator</p>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 69: Best Practice 1-3 -->
+<section class="slide content-slide" data-slide="68">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">A.11</p>
+        <h2 class="reveal">Best Practice (1–3)</h2>
+        <ul class="bullets reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <li><strong>1. CLAUDE.mdは短く強く</strong> — 巨大なwiki禁止。200行以内。詳細はrules/に分離。</li>
+            <li><strong>2. 汎用より役割専用agent</strong> — 権限を絞り、memoryを分離し、prompt driftを減らす。</li>
+            <li><strong>3. Skillはprogressive disclosure</strong> — すべての知識を常に注入せず、必要な時だけ取り出す。</li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- SLIDE 70: Best Practice 4-6 -->
+<section class="slide content-slide" data-slide="69">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">A.12</p>
+        <h2 class="reveal">Best Practice (4–6)</h2>
+        <ul class="bullets reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <li><strong>4. Hookは「事後処理」に強い</strong> — PostToolUseでフォーマッティング、Stopで検証リマインド。</li>
+            <li><strong>5. 権限はwildcardで管理</strong> — <code>Bash(npm run *)</code>、<code>Edit(/docs/**)</code>パターン許可。destructiveはask/deny。「意図的に狭く」が基本。</li>
+            <li><strong>6. モノレポは階層的設計</strong> — ルートCLAUDE.md（共通）+ パッケージ別CLAUDE.md（ドメイン）。一箇所に詰め込まない。</li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- SLIDE 71: Best Practice 7-8 -->
+<section class="slide content-slide" data-slide="70">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">A.13</p>
+        <h2 class="reveal">Best Practice (7–8)</h2>
+        <ul class="bullets reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <li><strong>7. 作業は小さく分割してcontext管理</strong> — plan modeで開始、50%付近で/compact、subtaskは50%以下で終わらせる、こまめにコミット。agent/skill/rulesを分割する理由は結局context管理。</li>
+            <li><strong>8. 人の承認ポイントはcommandに</strong> — デプロイ直前の確認、destructive actionの確認、オプション選択。agentにすべて任せると運用の統制力が落ちる。</li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- SLIDE 72: 推奨プロジェクト構造 -->
+<section class="slide content-slide" data-slide="71">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">A.14</p>
+        <h2 class="reveal">実務向け推奨プロジェクト構造</h2>
+        <div class="code-block reveal" style="position:relative; margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <code>project/
+├── CLAUDE.md          <span class="cmt"># 短い上位ルール</span>
+├── .mcp.json          <span class="cmt"># 外部サーバー接続</span>
+└── .claude/
+    ├── settings.json / settings.local.json
+    ├── rules/         <span class="cmt"># ドメイン別詳細ルール</span>
+    ├── commands/       <span class="cmt"># 人が開始するワークフロー</span>
+    ├── agents/         <span class="cmt"># 役割分離</span>
+    ├── skills/         <span class="cmt"># 再利用知識</span>
+    └── hooks/          <span class="cmt"># 自動フォーマット/検証/通知</span></code>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 73: 導入順序 -->
+<section class="slide content-slide" data-slide="72">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">A.15</p>
+        <h2 class="reveal">導入順序</h2>
+        <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">最初からすべて導入すると過剰。段階的に:</p>
+        <div class="flow reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <span class="flow-item" style="background:var(--accent);color:#fff;">CLAUDE.md</span><span class="flow-arrow">→</span>
+            <span class="flow-item">settings.json</span><span class="flow-arrow">→</span>
+            <span class="flow-item">commands</span><span class="flow-arrow">→</span>
+            <span class="flow-item">agents</span><span class="flow-arrow">→</span>
+            <span class="flow-item">skills</span><span class="flow-arrow">→</span>
+            <span class="flow-item">hooks</span>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 74: 最終結論 -->
+<section class="slide content-slide" data-slide="73">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">A.16</p>
+        <h2 class="reveal">最も実用的な結論</h2>
+        <ol class="reveal" style="padding-left:1.5em; margin-top:clamp(0.5rem,1vw,0.8rem); list-style:decimal;">
+            <li><code>.claude</code>は単なる設定フォルダではなく<strong>Claude Code運用レイヤー</strong>である。</li>
+            <li>command、agent、skillは代替物ではなく<strong>役割が異なる構成要素</strong>である。</li>
+            <li>良いセットアップ = 短いメモリ + モジュール化されたrules + 再利用skills + 制限されたagents + event-driven hooks</li>
+            <li><strong>チーム共有資産と個人資産を分離</strong>しないと長続きしない。</li>
+            <li><strong>context budgetと権限管理を構造で解決</strong>しないと安定的に動作しない。</li>
+        </ol>
+    </div>
+</section>
+
+
+<!-- ====================================================
+     SLIDE 75: CLOSING
+     ==================================================== -->
+<section class="slide section-slide" data-slide="74">
+    <div class="grid-bg-dark"></div>
+    <div class="slide-content" style="align-items:center; text-align:center;">
+        <p class="label reveal" style="color:var(--accent-light);">Thank You</p>
+        <h1 class="reveal" style="color:#fff;">AIコーディングエージェント<br>完全セットアップガイド</h1>
+        <p class="subtitle reveal" style="color:rgba(255,255,255,0.5); margin-top:1rem;">Claude Code · Codex · gstack · Ralph</p>
+        <div class="reveal" style="margin-top:clamp(1.5rem,3vw,2.5rem); font-size:var(--small-size); color:rgba(255,255,255,0.4); line-height:1.7;">
+            <strong style="color:rgba(255,255,255,0.7);">Brant Hwang</strong> · brant@querypie.com<br>
+            Founder & CEO at QueryPie AI · <span style="color:var(--accent-light);">www.querypie.com</span>
+        </div>
+    </div>
+</section>
+
+
+<!-- ====================================================
+     JAVASCRIPT: Presentation Controller
+     ==================================================== -->
+<script>
+class SlidePresentation {
+    constructor() {
+        this.slides = document.querySelectorAll('.slide');
+        this.currentSlide = 0;
+        this.isScrolling = false;
+        this.slides[0].classList.add('visible');
+        this.setupKeyboardNav();
+        this.setupTouchNav();
+        this.setupWheelNav();
+        this.setupProgressBar();
+        this.setupNavDots();
+    }
+
+    goToSlide(index) {
+        if (index < 0 || index >= this.slides.length) return;
+        this.slides[this.currentSlide].classList.remove('visible');
+        this.currentSlide = index;
+        document.body.style.transform = `translateX(-${index * 100}vw)`;
+        this.slides[index].classList.add('visible');
+        this.updateProgressBar();
+        this.updateNavDots();
+        this.updateSlideCounter();
+        this.updateHash();
+    }
+
+    setupKeyboardNav() {
+        document.addEventListener('keydown', (e) => {
+            if (e.target.getAttribute('contenteditable') === 'true') return;
+            switch(e.key) {
+                case 'ArrowRight': case 'ArrowDown': case ' ': case 'PageDown':
+                    e.preventDefault(); this.goToSlide(this.currentSlide + 1); break;
+                case 'ArrowLeft': case 'ArrowUp': case 'PageUp':
+                    e.preventDefault(); this.goToSlide(this.currentSlide - 1); break;
+                case 'Home': e.preventDefault(); this.goToSlide(0); break;
+                case 'End': e.preventDefault(); this.goToSlide(this.slides.length - 1); break;
+            }
+        });
+    }
+
+    setupTouchNav() {
+        let startX = 0;
+        document.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
+        document.addEventListener('touchend', e => {
+            const diff = startX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) {
+                diff > 0 ? this.goToSlide(this.currentSlide + 1) : this.goToSlide(this.currentSlide - 1);
+            }
+        }, { passive: true });
+    }
+
+    setupWheelNav() {
+        let accumulated = 0;
+        let timeout;
+        document.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            if (this.isScrolling) return;
+            const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+            accumulated += delta;
+            clearTimeout(timeout);
+            timeout = setTimeout(() => { accumulated = 0; }, 200);
+            if (Math.abs(accumulated) > 50) {
+                this.isScrolling = true;
+                accumulated > 0 ? this.goToSlide(this.currentSlide + 1) : this.goToSlide(this.currentSlide - 1);
+                accumulated = 0;
+                setTimeout(() => { this.isScrolling = false; }, 300);
+            }
+        }, { passive: false });
+    }
+
+    setupProgressBar() {
+        this.progressBar = document.getElementById('progressBar');
+        this.updateProgressBar();
+    }
+
+    updateProgressBar() {
+        if (!this.progressBar) return;
+        const pct = ((this.currentSlide + 1) / this.slides.length) * 100;
+        this.progressBar.style.width = pct + '%';
+    }
+
+    setupNavDots() {
+        const nav = document.getElementById('navDots');
+        if (!nav) return;
+        this.slides.forEach((_, i) => {
+            const dot = document.createElement('button');
+            dot.className = 'nav-dot' + (i === 0 ? ' active' : '');
+            dot.setAttribute('aria-label', `Slide ${i + 1}`);
+            dot.addEventListener('click', () => this.goToSlide(i));
+            nav.appendChild(dot);
+        });
+        this.dots = nav.querySelectorAll('.nav-dot');
+    }
+
+    updateNavDots() {
+        if (!this.dots) return;
+        this.dots.forEach((d, i) => d.classList.toggle('active', i === this.currentSlide));
+    }
+
+    updateSlideCounter() {
+        const el = document.getElementById('slideCounter');
+        if (el) el.textContent = `${this.currentSlide + 1} / ${this.slides.length}`;
+    }
+
+    updateHash() {
+        history.replaceState(null, '', '#' + (this.currentSlide + 1));
+    }
+
+    loadFromHash() {
+        const hash = parseInt(location.hash.replace('#', ''), 10);
+        if (hash > 0 && hash <= this.slides.length) {
+            this.slides[this.currentSlide].classList.remove('visible');
+            this.currentSlide = hash - 1;
+            document.body.style.transform = `translateX(-${(hash - 1) * 100}vw)`;
+            this.slides[hash - 1].classList.add('visible');
+            this.updateProgressBar();
+            this.updateNavDots();
+            this.updateSlideCounter();
+        }
+    }
+}
+
+/* === INLINE EDITOR === */
+class InlineEditor {
+    constructor() {
+        this.isActive = false;
+        this.storageKey = 'slides-edit-' + location.pathname;
+        this.loadEdits();
+    }
+
+    toggleEditMode() {
+        this.isActive = !this.isActive;
+        const toggle = document.getElementById('editToggle');
+        const banner = document.getElementById('editBanner');
+        toggle.classList.toggle('active', this.isActive);
+        banner.classList.toggle('show', this.isActive);
+
+        document.querySelectorAll('h1, h2, h3, p, li, code, span').forEach(el => {
+            if (el.closest('.nav-dots') || el.closest('.edit-banner') || el.closest('.edit-toggle')) return;
+            el.contentEditable = this.isActive ? 'true' : 'false';
+        });
+    }
+
+    saveEdits() {
+        const data = {};
+        document.querySelectorAll('.slide').forEach((slide, i) => {
+            data[i] = slide.innerHTML;
+        });
+        localStorage.setItem(this.storageKey, JSON.stringify(data));
+    }
+
+    loadEdits() {
+        const raw = localStorage.getItem(this.storageKey);
+        if (!raw) return;
+        try {
+            const data = JSON.parse(raw);
+            document.querySelectorAll('.slide').forEach((slide, i) => {
+                if (data[i]) slide.innerHTML = data[i];
+            });
+        } catch(e) {}
+    }
+
+    exportFile() {
+        const html = document.documentElement.outerHTML;
+        const blob = new Blob([html], { type: 'text/html' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'presentation-edited.html';
+        a.click();
+    }
+}
+
+/* Init */
+const presentation = new SlidePresentation();
+presentation.loadFromHash();
+
+function navigateToId(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const idx = [...presentation.slides].indexOf(el);
+    if (idx !== -1) presentation.goToSlide(idx);
+}
+window.addEventListener('hashchange', () => presentation.loadFromHash());
+const editor = new InlineEditor();
+
+/* Edit toggle hover & keyboard */
+const hotzone = document.getElementById('editHotzone');
+const editToggle = document.getElementById('editToggle');
+let hideTimeout = null;
+
+hotzone.addEventListener('mouseenter', () => { clearTimeout(hideTimeout); editToggle.classList.add('show'); });
+hotzone.addEventListener('mouseleave', () => { hideTimeout = setTimeout(() => { if (!editor.isActive) editToggle.classList.remove('show'); }, 400); });
+editToggle.addEventListener('mouseenter', () => { clearTimeout(hideTimeout); });
+editToggle.addEventListener('mouseleave', () => { hideTimeout = setTimeout(() => { if (!editor.isActive) editToggle.classList.remove('show'); }, 400); });
+editToggle.addEventListener('click', () => { editor.toggleEditMode(); });
+hotzone.addEventListener('click', () => { editor.toggleEditMode(); });
+
+document.addEventListener('keydown', (e) => {
+    if ((e.key === 'e' || e.key === 'E') && !e.target.getAttribute('contenteditable')) {
+        editor.toggleEditMode();
+    }
+    if (e.ctrlKey && e.key === 's') {
+        e.preventDefault();
+        editor.saveEdits();
+    }
+});
+</script>
+
+</body>
+</html>

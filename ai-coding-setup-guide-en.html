@@ -1,0 +1,2456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    <title>AI Coding Agent Complete Setup Guide</title>
+    <meta property="og:url" content="https://ai-coding-guide-with-gstack.vercel.app/ai-coding-setup-guide-en.html">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="AI Coding Agent Complete Setup Guide">
+    <meta property="og:description" content="Setting up Claude Code + Codex + gstack + Ralph from scratch, all the way to real-world usage.">
+    <meta property="og:image" content="https://ai-coding-guide-with-gstack.vercel.app/og/og-en.png">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="AI Coding Agent Complete Setup Guide">
+    <meta name="twitter:image" content="https://ai-coding-guide-with-gstack.vercel.app/og/og-en.png">
+
+    <!-- Fonts: Noto Sans (clean English) + JetBrains Mono (code) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        /* ===========================================
+           CSS CUSTOM PROPERTIES (THEME)
+           Swiss Modern — toned-down deep blue accent
+           =========================================== */
+        :root {
+            /* Colors */
+            --bg-primary: #ffffff;
+            --bg-dark: #1a1a2e;
+            --bg-light: #f5f5f8;
+            --accent: #3d5a80;
+            --accent-light: #5b7ea1;
+            --accent-muted: rgba(61, 90, 128, 0.08);
+            --accent-border: rgba(61, 90, 128, 0.15);
+            --text-primary: #1a1a1a;
+            --text-secondary: #555;
+            --text-tertiary: #888;
+            --text-on-accent: #ffffff;
+            --code-bg: #1e1e2e;
+            --code-text: #cdd6f4;
+            --code-keyword: #89b4fa;
+            --code-string: #a6e3a1;
+            --code-comment: #6c7086;
+            --table-border: #ddd;
+            --table-header: #e8edf3;
+            --highlight: #e8d44d;
+
+            /* Typography — MUST use clamp() */
+            --font-display: 'Noto Sans', sans-serif;
+            --font-body: 'Noto Sans', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --title-size: clamp(2rem, 5.5vw, 4.5rem);
+            --h2-size: clamp(1.4rem, 3.5vw, 2.4rem);
+            --h3-size: clamp(1.1rem, 2.2vw, 1.5rem);
+            --body-size: clamp(0.75rem, 1.4vw, 1.05rem);
+            --small-size: clamp(0.65rem, 1vw, 0.85rem);
+            --code-size: clamp(0.65rem, 1.1vw, 0.85rem);
+
+            /* Spacing */
+            --slide-padding: clamp(1.5rem, 4vw, 4rem);
+            --content-gap: clamp(0.5rem, 2vw, 2rem);
+            --element-gap: clamp(0.25rem, 1vw, 1rem);
+
+            /* Animation */
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --duration-normal: 0.6s;
+        }
+
+        /* ===========================================
+           BASE STYLES
+           =========================================== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        /* === VIEWPORT BASE (MANDATORY) === */
+        html { height: 100%; margin: 0; overflow: hidden; }
+        body { height: 100%; margin: 0; display: flex; transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        .slide {
+            min-width: 100vw; width: 100vw; height: 100vh; height: 100dvh;
+            overflow: hidden; flex-shrink: 0;
+            display: flex; flex-direction: column; position: relative;
+        }
+        .slide-content {
+            flex: 1; display: flex; flex-direction: column; justify-content: center;
+            max-height: 100%; overflow: hidden; padding: var(--slide-padding);
+        }
+        .card, .container, .content-box {
+            max-width: min(90vw, 1000px); max-height: min(80vh, 700px);
+        }
+        .feature-list, .bullet-list { gap: clamp(0.4rem, 1vh, 1rem); }
+        .feature-list li, .bullet-list li { font-size: var(--body-size); line-height: 1.4; }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+            gap: clamp(0.5rem, 1.5vw, 1rem);
+        }
+        img, .image-container {
+            max-width: 100%; max-height: min(50vh, 400px); object-fit: contain;
+        }
+        @media (max-height: 700px) {
+            :root {
+                --slide-padding: clamp(0.75rem, 3vw, 2rem);
+                --content-gap: clamp(0.4rem, 1.5vw, 1rem);
+                --title-size: clamp(1.25rem, 4.5vw, 2.5rem);
+                --h2-size: clamp(1rem, 3vw, 1.75rem);
+            }
+        }
+        @media (max-height: 600px) {
+            :root {
+                --slide-padding: clamp(0.5rem, 2.5vw, 1.5rem);
+                --content-gap: clamp(0.3rem, 1vw, 0.75rem);
+                --title-size: clamp(1.1rem, 4vw, 2rem);
+                --body-size: clamp(0.7rem, 1.2vw, 0.95rem);
+            }
+            .nav-dots, .keyboard-hint, .decorative { display: none; }
+        }
+        @media (max-height: 500px) {
+            :root {
+                --slide-padding: clamp(0.4rem, 2vw, 1rem);
+                --title-size: clamp(1rem, 3.5vw, 1.5rem);
+                --h2-size: clamp(0.9rem, 2.5vw, 1.25rem);
+                --body-size: clamp(0.65rem, 1vw, 0.85rem);
+            }
+        }
+        @media (max-width: 600px) {
+            :root { --title-size: clamp(1.25rem, 7vw, 2.5rem); }
+            .grid { grid-template-columns: 1fr; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* ===========================================
+           GLOBAL SLIDE STYLES
+           =========================================== */
+        body {
+            font-family: var(--font-body);
+            color: var(--text-primary);
+            background: var(--bg-primary);
+        }
+
+        /* Grid background */
+        .grid-bg {
+            position: absolute; inset: 0; pointer-events: none;
+            background-image:
+                linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+        .grid-bg-dark {
+            position: absolute; inset: 0; pointer-events: none;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+
+        /* Accent block — right side geometric element */
+        .accent-block {
+            position: absolute; top: 0; right: 0; width: 30%; height: 100%;
+            background: var(--accent);
+            clip-path: polygon(20% 0, 100% 0, 100% 100%, 0% 100%);
+            z-index: 0;
+        }
+        .accent-block-small {
+            display: none;
+        }
+
+        /* Section number watermark */
+        .section-number {
+            position: absolute;
+            bottom: clamp(1rem, 2vw, 2rem);
+            left: clamp(1.5rem, 3vw, 3rem);
+            font-family: var(--font-display); font-weight: 900;
+            font-size: clamp(4rem, 12vw, 10rem);
+            color: rgba(0,0,0,0.03); line-height: 1; z-index: 0;
+            user-select: none;
+        }
+        .section-number-dark {
+            color: rgba(255,255,255,0.04);
+        }
+
+        /* ===========================================
+           TYPOGRAPHY
+           =========================================== */
+        h1 {
+            font-family: var(--font-display); font-weight: 900;
+            font-size: var(--title-size); line-height: 1.08;
+            letter-spacing: -0.03em; color: var(--text-primary);
+        }
+        h2 {
+            font-family: var(--font-display); font-weight: 800;
+            font-size: var(--h2-size); line-height: 1.15;
+            letter-spacing: -0.02em; color: var(--text-primary);
+        }
+        h3 {
+            font-family: var(--font-display); font-weight: 700;
+            font-size: var(--h3-size); line-height: 1.3;
+            color: var(--accent);
+        }
+        p, li {
+            font-family: var(--font-body);
+            font-size: var(--body-size);
+            line-height: 1.65; color: var(--text-secondary);
+        }
+
+        /* ===========================================
+           LABEL / TAG STYLES
+           =========================================== */
+        .label {
+            font-family: var(--font-display); font-weight: 800;
+            font-size: clamp(0.6rem, 0.9vw, 0.75rem);
+            letter-spacing: 0.2em; text-transform: uppercase;
+            color: var(--accent); margin-bottom: clamp(0.5rem, 1vw, 1rem);
+            display: inline-block;
+        }
+        .label-light { color: var(--accent-light); }
+        .tag {
+            display: inline-block; padding: 0.3rem 0.8rem;
+            background: var(--accent-muted); border: 1px solid var(--accent-border);
+            border-radius: 4px; font-size: var(--small-size);
+            font-weight: 600; color: var(--accent);
+        }
+        .tag-dark {
+            background: rgba(255,255,255,0.08);
+            border-color: rgba(255,255,255,0.15);
+            color: var(--accent-light);
+        }
+
+        /* ===========================================
+           SLIDE TYPES
+           =========================================== */
+
+        /* --- Title Slide --- */
+        .title-slide {
+            background: var(--bg-primary); position: relative;
+        }
+        .title-slide .slide-content {
+            max-width: 65%; z-index: 2;
+        }
+        .title-slide h1 { margin-bottom: clamp(0.8rem, 1.5vw, 1.5rem); }
+        .title-slide .subtitle {
+            font-size: clamp(0.85rem, 1.3vw, 1.1rem);
+            color: var(--text-secondary); line-height: 1.6;
+            max-width: 520px;
+        }
+
+        /* --- Section Divider Slide --- */
+        .section-slide {
+            background: var(--bg-dark); color: #fff;
+        }
+        .section-slide .slide-content { z-index: 2; }
+        .section-slide h1 { color: #fff; }
+        .section-slide .label { color: var(--accent-light); }
+        .section-slide .subtitle { color: rgba(255,255,255,0.6); }
+
+        /* --- Content Slide --- */
+        .content-slide { background: var(--bg-primary); }
+        .content-slide .slide-content { z-index: 2; }
+
+        /* --- Code Slide --- */
+        .code-block {
+            background: var(--code-bg); border-radius: 8px;
+            padding: clamp(0.8rem, 1.5vw, 1.2rem);
+            margin-top: clamp(0.5rem, 1vw, 0.8rem);
+            overflow: hidden;
+        }
+        .code-block code {
+            font-family: var(--font-mono); font-size: var(--code-size);
+            color: var(--code-text); line-height: 1.6;
+            display: block; white-space: pre; overflow-x: auto;
+        }
+        .code-block .kw { color: var(--code-keyword); }
+        .code-block .str { color: var(--code-string); }
+        .code-block .cmt { color: var(--code-comment); }
+        .code-lang {
+            position: absolute; top: 8px; right: 12px;
+            font-family: var(--font-mono); font-size: 0.65rem;
+            color: var(--code-comment); text-transform: uppercase;
+        }
+
+        /* --- Table Slide --- */
+        .slide-table {
+            width: 100%; border-collapse: collapse;
+            font-size: clamp(0.65rem, 1.1vw, 0.85rem);
+            margin-top: clamp(0.5rem, 1vw, 0.8rem);
+        }
+        .slide-table th, .slide-table td {
+            padding: clamp(0.3rem, 0.7vw, 0.6rem) clamp(0.5rem, 1vw, 0.8rem);
+            border: 1px solid var(--table-border); text-align: left;
+        }
+        .slide-table th {
+            background: var(--table-header); font-weight: 700;
+            font-family: var(--font-display);
+            font-size: clamp(0.6rem, 1vw, 0.8rem);
+        }
+        .slide-table td { color: var(--text-secondary); }
+
+        /* --- Bullet list --- */
+        .bullets {
+            list-style: none; padding: 0;
+            margin-top: clamp(0.5rem, 1vw, 0.8rem);
+        }
+        .bullets li {
+            padding-left: 1.5em; position: relative;
+            margin-bottom: clamp(0.3rem, 0.6vw, 0.5rem);
+        }
+        .bullets li::before {
+            content: ''; position: absolute; left: 0;
+            top: 0.6em; width: 6px; height: 6px;
+            background: var(--accent); border-radius: 1px;
+        }
+        .bullets-dark li::before { background: var(--accent-light); }
+
+        /* --- Highlight box --- */
+        .highlight-box {
+            background: var(--accent-muted); border-left: 3px solid var(--accent);
+            padding: clamp(0.6rem, 1vw, 1rem) clamp(0.8rem, 1.5vw, 1.2rem);
+            border-radius: 0 6px 6px 0;
+            margin-top: clamp(0.4rem, 0.8vw, 0.6rem);
+        }
+        .highlight-box p { color: var(--text-primary); font-weight: 500; }
+        .highlight-box-dark {
+            background: rgba(255,255,255,0.05);
+            border-left-color: var(--accent-light);
+        }
+        .highlight-box-dark p { color: rgba(255,255,255,0.9); }
+
+        /* --- Two Column --- */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: clamp(1rem, 2vw, 2rem);
+            margin-top: clamp(0.5rem, 1vw, 0.8rem);
+        }
+        @media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
+
+        /* --- Flow diagram (text-based) --- */
+        .flow {
+            display: flex; flex-wrap: wrap; align-items: center; gap: clamp(0.3rem, 0.5vw, 0.5rem);
+            margin-top: clamp(0.5rem, 1vw, 0.8rem);
+        }
+        .flow-item {
+            padding: clamp(0.25rem, 0.5vw, 0.4rem) clamp(0.5rem, 1vw, 0.8rem);
+            background: var(--accent-muted); border-radius: 4px;
+            font-size: var(--small-size); font-weight: 600; color: var(--accent);
+        }
+        .flow-arrow {
+            font-size: var(--small-size); color: var(--text-tertiary);
+        }
+
+        /* ===========================================
+           ANIMATIONS
+           =========================================== */
+        .reveal {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .slide.visible .reveal { opacity: 1; }
+
+        .reveal-left {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .slide.visible .reveal-left { opacity: 1; }
+
+        /* ===========================================
+           PROGRESS BAR
+           =========================================== */
+        .progress-bar {
+            position: fixed; top: 0; left: 0; height: 3px;
+            background: var(--accent); z-index: 9999;
+            transition: width 0.3s ease; width: 0%;
+        }
+
+        /* Nav dots removed */
+
+        /* ===========================================
+           EDIT MODE (Opt-in)
+           =========================================== */
+        .edit-hotzone {
+            position: fixed; top: 0; left: 0;
+            width: 80px; height: 80px; z-index: 10000; cursor: pointer;
+        }
+        .edit-toggle {
+            position: fixed; top: 12px; left: 12px;
+            width: 36px; height: 36px; border-radius: 50%;
+            background: var(--accent); color: #fff;
+            border: none; font-size: 16px; cursor: pointer;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.3s ease, transform 0.2s ease;
+            z-index: 10001; display: flex; align-items: center; justify-content: center;
+        }
+        .edit-toggle.show, .edit-toggle.active {
+            opacity: 1; pointer-events: auto;
+        }
+        .edit-toggle:hover { transform: scale(1.1); }
+
+        [contenteditable="true"] {
+            outline: 2px dashed var(--accent);
+            outline-offset: 2px; cursor: text;
+            border-radius: 2px;
+        }
+        .edit-banner {
+            position: fixed; bottom: 20px; left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent); color: #fff;
+            padding: 8px 20px; border-radius: 20px;
+            font-size: 0.8rem; font-weight: 600; z-index: 10001;
+            display: none; font-family: var(--font-body);
+        }
+        .edit-banner.show { display: block; }
+
+        /* ===========================================
+           KEYBOARD HINT
+           =========================================== */
+        .keyboard-hint {
+            position: fixed; bottom: clamp(8px, 1.5vw, 16px);
+            right: clamp(8px, 1.5vw, 20px);
+            font-family: var(--font-mono); font-size: 0.65rem;
+            color: var(--text-tertiary); z-index: 9998;
+            opacity: 0.5;
+        }
+
+        /* === SLIDE COUNTER === */
+        .slide-counter {
+            position: fixed; bottom: clamp(8px, 1.5vw, 16px);
+            left: clamp(12px, 2vw, 24px);
+            font-family: var(--font-mono); font-size: clamp(0.65rem, 1vw, 0.8rem);
+            color: var(--text-tertiary); z-index: 9998;
+            opacity: 0.5; transition: opacity 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Progress Bar -->
+<div class="progress-bar" id="progressBar"></div>
+
+
+<!-- Edit Mode -->
+<div class="edit-hotzone" id="editHotzone"></div>
+<button class="edit-toggle" id="editToggle" title="Edit mode (E)">&#9998;</button>
+<div class="edit-banner" id="editBanner">Edit Mode — Click text to edit · Ctrl+S to save</div>
+
+<!-- Slide counter -->
+<div class="slide-counter" id="slideCounter">1 / 76</div>
+
+<!-- Keyboard hint -->
+<div class="keyboard-hint">←→ / Space</div>
+
+
+<!-- ====================================================
+     SLIDE 1: TITLE
+     ==================================================== -->
+<section class="slide title-slide" data-slide="0">
+    <div class="grid-bg"></div>
+    <div class="accent-block"></div>
+    <div class="slide-content">
+        <p class="label reveal">Complete Setup Guide</p>
+        <h1 class="reveal">AI Coding<br>Agent<br>Setup Guide</h1>
+        <p class="subtitle reveal">Setting up Claude Code + Codex + gstack + Ralph from scratch, all the way to real-world usage.</p>
+        <div style="margin-top: clamp(0.8rem,1.5vw,1.5rem)">
+            <span class="tag reveal">2026-03-20</span>
+        </div>
+        <div class="reveal" style="margin-top:clamp(1rem,2vw,2rem); font-size:var(--small-size); color:var(--text-secondary); line-height:1.7;">
+            <strong style="color:var(--text-primary);">Brant Hwang</strong> · brant@querypie.com<br>
+            Founder & CEO at QueryPie AI · <a href="https://www.querypie.com" target="_blank" style="color:var(--accent); text-decoration:none;">www.querypie.com</a>
+        </div>
+    </div>
+    <div class="section-number">01</div>
+</section>
+
+
+<!-- ====================================================
+     SLIDE 1.5: About This Document
+     ==================================================== -->
+<section class="slide content-slide" data-slide="0a">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">About</p>
+        <h2 class="reveal">About This Document</h2>
+        <p class="reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem); line-height:1.8;">
+            This document was drafted entirely by <strong>Brant Hwang</strong>, refined with AI assistance, then generated as HTML slides using the <strong>frontend-slides</strong> skill and deployed to Vercel.
+        </p>
+        <div class="highlight-box reveal" style="margin-top:clamp(0.8rem,1.5vw,1.2rem);">
+            <p style="font-size:var(--small-size); line-height:1.7;">
+                Slide generation skill: <span style="color:var(--accent);">github.com/zarazhangrui/frontend-slides</span>
+            </p>
+        </div>
+    </div>
+</section>
+
+
+<!-- ====================================================
+     SLIDE 2: Table of Contents
+     ==================================================== -->
+<section class="slide content-slide" data-slide="1">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">Overview</p>
+        <h2 class="reveal">Table of Contents</h2>
+        <ol class="reveal" style="padding-left:1.5em; margin-top:clamp(0.5rem,1vw,0.8rem); list-style:decimal;" start="0">
+            <li><a href="javascript:void(0)" onclick="navigateToId('sec-intro')" style="color:var(--accent); text-decoration:none; border-bottom:1px solid var(--accent-border);">Why This Guide Exists</a></li>
+            <li><a href="javascript:void(0)" onclick="navigateToId('sec-1')" style="color:var(--accent); text-decoration:none; border-bottom:1px solid var(--accent-border);">Complete Removal of Existing Environment</a></li>
+            <li><a href="javascript:void(0)" onclick="navigateToId('sec-2')" style="color:var(--accent); text-decoration:none; border-bottom:1px solid var(--accent-border);">Clean Install & Minimal Configuration</a></li>
+            <li><a href="javascript:void(0)" onclick="navigateToId('sec-3')" style="color:var(--accent); text-decoration:none; border-bottom:1px solid var(--accent-border);">Why Harness Engineering Matters</a></li>
+            <li><a href="javascript:void(0)" onclick="navigateToId('sec-4')" style="color:var(--accent); text-decoration:none; border-bottom:1px solid var(--accent-border);">Centralized Skill Management for Harness Engineering</a></li>
+            <li><a href="javascript:void(0)" onclick="navigateToId('sec-5')" style="color:var(--accent); text-decoration:none; border-bottom:1px solid var(--accent-border);">gstack Deep Dive</a></li>
+            <li><a href="javascript:void(0)" onclick="navigateToId('sec-6')" style="color:var(--accent); text-decoration:none; border-bottom:1px solid var(--accent-border);">CLAUDE.md / AGENTS.md Configuration</a></li>
+            <li><a href="javascript:void(0)" onclick="navigateToId('sec-7')" style="color:var(--accent); text-decoration:none; border-bottom:1px solid var(--accent-border);">Hands-on Example: Building a Todo Web App with gstack + Ralph</a></li>
+            <li><a href="javascript:void(0)" onclick="navigateToId('sec-a')" style="color:var(--accent); text-decoration:none; border-bottom:1px solid var(--accent-border);">Appendix — Understanding Claude Code Internals</a></li>
+        </ol>
+    </div>
+</section>
+
+
+<!-- ====================================================
+     SLIDE 2.5: Intro — Why This Guide Exists
+     ==================================================== -->
+<section class="slide content-slide" id="sec-intro" data-slide="2a">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">Intro</p>
+        <h2 class="reveal">Why This Guide Exists</h2>
+        <p class="reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem); line-height:1.8;">
+            After trying <strong>gstack</strong>, released by Garry Tan (Y-Combinator CEO), I found it was the perfect harness for my workflow. From planning to review, QA, deployment, and retrospectives — it felt like a fast-moving early-stage startup from the Y-Combinator days, implemented as an AI harness.
+        </p>
+        <p class="reveal" style="margin-top:clamp(0.4rem,0.8vw,0.6rem); line-height:1.8;">
+            So I decided to rebuild my entire AI coding environment from scratch. After testing countless harnesses — bkit, superpower, oh my codex, oh my claude code, and more — my local environment was cluttered with unnecessary files and badly needed a cleanup.
+        </p>
+        <div class="highlight-box reveal" style="margin-top:clamp(0.6rem,1vw,1rem);">
+            <p>And since I was starting over anyway, I figured documenting the process might help someone doing this for the first time — so I wrote this guide.</p>
+        </div>
+    </div>
+</section>
+
+
+<!-- ====================================================
+     SLIDE 3: SECTION — 1. Complete Removal of Existing Environment
+     ==================================================== -->
+<section class="slide section-slide" id="sec-1" data-slide="2">
+    <div class="grid-bg-dark"></div>
+    <div class="slide-content" style="align-items:center; text-align:center;">
+        <p class="label reveal" style="color:var(--accent-light);">Section 01</p>
+        <h1 class="reveal" style="color:#fff;">Complete Removal<br>of Existing Environment</h1>
+        <p class="subtitle reveal" style="color:rgba(255,255,255,0.5); margin-top:0.8rem;">Wipe all existing configurations clean and start fresh.</p>
+    </div>
+    <div class="section-number section-number-dark">01</div>
+</section>
+
+
+<!-- SLIDE 4: Remove Claude Code -->
+<section class="slide content-slide" data-slide="3">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">1-1</p>
+        <h2 class="reveal">Remove Claude Code Entirely</h2>
+        <div class="code-block reveal" style="position:relative; margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <span class="code-lang">bash</span>
+            <code><span class="kw">rm</span> -rf ~/.claude.json
+<span class="kw">rm</span> -rf ~/.claude
+<span class="kw">rm</span> -rf ~/.mcp.json
+<span class="kw">rm</span> -f ~/.local/bin/claude
+<span class="kw">rm</span> -rf ~/.local/share/claude</code>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 5: Remove Codex -->
+<section class="slide content-slide" data-slide="4">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">1-2</p>
+        <h2 class="reveal">Remove Codex & Oh My Codex</h2>
+        <div class="code-block reveal" style="position:relative; margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <span class="code-lang">bash</span>
+            <code><span class="kw">npm</span> uninstall @openai/codex
+<span class="kw">omx</span> uninstall
+<span class="kw">rm</span> -rf ~/.codex
+<span class="kw">rm</span> -rf ~/.omx</code>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 6: Remove .agents -->
+<section class="slide content-slide" data-slide="5">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">1-3</p>
+        <h2 class="reveal">Remove .agents</h2>
+        <div class="code-block reveal" style="position:relative; margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <span class="code-lang">bash</span>
+            <code><span class="kw">rm</span> -rf ~/.agents</code>
+        </div>
+        <div class="highlight-box reveal" style="margin-top:clamp(0.8rem,1.5vw,1.2rem);">
+            <p>You are now back to a completely clean state.</p>
+        </div>
+    </div>
+</section>
+
+
+<!-- ====================================================
+     SLIDE 7: SECTION — 2. Clean Install & Minimal Configuration
+     ==================================================== -->
+<section class="slide section-slide" id="sec-2" data-slide="6">
+    <div class="grid-bg-dark"></div>
+    <div class="slide-content" style="align-items:center; text-align:center;">
+        <p class="label reveal" style="color:var(--accent-light);">Section 02</p>
+        <h1 class="reveal" style="color:#fff;">Clean Install &<br>Minimal Configuration</h1>
+    </div>
+    <div class="section-number section-number-dark">02</div>
+</section>
+
+
+<!-- SLIDE 8: Install Claude Code + RTK -->
+<section class="slide content-slide" data-slide="7">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">2-1</p>
+        <h2 class="reveal">Install Claude Code & RTK</h2>
+        <div class="code-block reveal" style="position:relative; margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <span class="code-lang">bash</span>
+            <code><span class="kw">curl</span> -fsSL https://claude.ai/install.sh | bash
+<span class="kw">brew</span> install rtk   <span class="cmt"># or brew upgrade rtk</span>
+<span class="kw">rtk</span> init --global</code>
+        </div>
+        <div class="highlight-box reveal" style="margin-top:clamp(0.6rem,1vw,1rem);">
+            <p><strong>RTK</strong> is an LLM Proxy that analyzes LLM token patterns and reduces token usage by <strong>60-90%</strong>. It can significantly cut Claude Code costs.</p>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 9: Install Codex -->
+<section class="slide content-slide" data-slide="8">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">2-2</p>
+        <h2 class="reveal">Install Codex</h2>
+        <div class="code-block reveal" style="position:relative; margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <span class="code-lang">bash</span>
+            <code><span class="kw">brew</span> install --cask codex</code>
+        </div>
+        <div class="highlight-box reveal" style="margin-top:clamp(0.6rem,1vw,1rem);">
+            <p>Warning: Installing via npm causes PATH conflicts when using local node environments through mise, as each project gets a different PATH. <strong>Install via brew instead.</strong></p>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 10: Codex Configuration -->
+<section class="slide content-slide" data-slide="9">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">2-3</p>
+        <h2 class="reveal">Codex 1M Context & Fast Mode</h2>
+        <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);"><code style="font-family:var(--font-mono);">~/.codex/config.toml</code></p>
+        <div class="code-block reveal" style="position:relative; margin-top:clamp(0.4rem,0.8vw,0.6rem);">
+            <span class="code-lang">toml</span>
+            <code><span class="kw">model</span> = <span class="str">"gpt-5.4"</span>
+<span class="kw">model_context_window</span> = <span class="str">1000000</span>
+<span class="kw">model_reasoning_effort</span> = <span class="str">"high"</span>
+<span class="kw">service_tier</span> = <span class="str">"fast"</span></code>
+        </div>
+    </div>
+</section>
+
+
+<!-- ====================================================
+     SECTION — 3. Why Harness Engineering Matters
+     ==================================================== -->
+<section class="slide section-slide" id="sec-3" data-slide="10">
+    <div class="grid-bg-dark"></div>
+    <div class="slide-content" style="align-items:center; text-align:center;">
+        <p class="label reveal" style="color:var(--accent-light);">Section 03</p>
+        <h1 class="reveal" style="color:#fff;">Why Harness Engineering<br>Matters</h1>
+    </div>
+</section>
+
+
+<!-- SLIDE: Engineering Evolution -->
+<section class="slide content-slide" data-slide="11">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">3-1</p>
+        <h2 class="reveal">The Evolution of Engineering</h2>
+        <table class="slide-table reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <tr><th>Era</th><th>Core Competency</th><th>Core Question</th></tr>
+            <tr><td><strong>2024</strong></td><td>Prompt Engineering</td><td>How to ask AI the right way</td></tr>
+            <tr><td><strong>2025</strong></td><td>Context Engineering</td><td>How to deliver the right information to AI</td></tr>
+            <tr><td><strong>2026</strong></td><td>Harness Engineering</td><td>How to design an environment where AI can't fail</td></tr>
+        </table>
+        <p class="reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem); font-size:var(--small-size); color:var(--text-secondary);">2024: people who write good prompts → 2025: people who can build agents → 2026: people who can design the environment where AI works</p>
+    </div>
+</section>
+
+
+<!-- SLIDE: Why the Evolution Happened -->
+<section class="slide content-slide" data-slide="12">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">3-2</p>
+        <h2 class="reveal">Why This Evolution — Driven by LLM Progress</h2>
+        <ul class="bullets reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <li><strong>Early LLMs (GPT-3~3.5)</strong> — 4K token context window. All you could do was craft clear instructions within a short prompt. The "Prompt Engineering" era</li>
+            <li><strong>Mid LLMs (GPT-4, Claude 3)</strong> — Context expanded to 128K~200K. Now you could feed entire codebases, docs, and history. "What to show" became the key — the "Context Engineering" era</li>
+            <li><strong>Current LLMs (Claude 4, GPT-5)</strong> — Agents autonomously write code, commit, and open PRs. The problem shifted from "one good answer" to "controlling hundreds of autonomous actions" — the "Harness Engineering" era</li>
+        </ul>
+        <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem); font-size:var(--small-size); color:var(--text-tertiary);">Karpathy: "Think of an LLM like a CPU, and its context window as the RAM. Your job as an engineer is akin to an OS — load that working memory with just the right code and data for the task."</p>
+    </div>
+</section>
+
+
+<!-- SLIDE: Context Engineering -->
+<section class="slide content-slide" data-slide="13">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">3-3</p>
+        <h2 class="reveal">① Context Engineering — What to Tell AI</h2>
+        <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">You wouldn't tell a new hire "just work" with zero onboarding. AI is no different.</p>
+        <ul class="bullets reveal" style="margin-top:clamp(0.4rem,0.8vw,0.6rem);">
+            <li>Project rules, coding conventions, work status… deliver this via <strong>CLAUDE.md, AGENTS.md</strong></li>
+            <li>Information the agent can't read <strong>doesn't exist</strong></li>
+            <li>Cognition (Devin team): "Context engineering is effectively the #1 job of engineers building AI agents"</li>
+        </ul>
+        <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem); font-size:var(--small-size); color:var(--text-tertiary);">Anthropic: "Long-running agents begin each new session with no memory of what came before — like engineers working in shifts with no handoff documentation."</p>
+    </div>
+</section>
+
+
+<!-- SLIDE: Architecture Constraints -->
+<section class="slide content-slide" data-slide="14">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">3-4</p>
+        <h2 class="reveal">② Architecture Constraints — Define What AI Must NOT Do</h2>
+        <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">Like bowling bumpers — give full freedom and AI flounders; set boundaries and it reaches the answer faster.</p>
+        <ul class="bullets reveal" style="margin-top:clamp(0.4rem,0.8vw,0.6rem);">
+            <li>Paradoxically, <strong>constraints boost productivity</strong></li>
+            <li>Mitchell Hashimoto (HashiCorp founder): "Anytime an agent makes a mistake, engineer a solution so it never makes that mistake again"</li>
+            <li>OpenAI Codex team: dependency flow, layer separation, and custom linters as constraints dramatically improved agent reliability</li>
+            <li>Karpathy's CLAUDE.md is exactly this approach — not "how to code" but <strong>"what not to do"</strong></li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- SLIDE: Garbage Collection -->
+<section class="slide content-slide" data-slide="15">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">3-5</p>
+        <h2 class="reveal">③ Garbage Collection — Clean Up After AI</h2>
+        <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">AI replicates good patterns, but it replicates bad patterns too. Without cleanup, quality degrades over time.</p>
+        <ul class="bullets reveal" style="margin-top:clamp(0.4rem,0.8vw,0.6rem);">
+            <li>The OpenAI team initially spent <strong>every Friday as "AI slop cleanup day"</strong> — 20% of work time on cleanup</li>
+            <li>Eventually built automated cleanup into the harness: background agents scan for architecture violations and auto-generate refactoring PRs</li>
+            <li>OpenAI: "Technical debt is a high-interest loan. It compounds if left unpaid — it's always better to pay it down continuously"</li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- SLIDE: Real Results -->
+<section class="slide content-slide" data-slide="16">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">3-6</p>
+        <h2 class="reveal">Real Results of Harness Engineering</h2>
+        <ul class="bullets reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <li><strong>OpenAI Codex</strong> — 1M+ lines of production code, zero hand-written. ~1,500 PRs over 5 months. 3 engineers averaging 3.5 PRs per person per day</li>
+            <li><strong>LangChain</strong> — Same model (GPT-5.2-Codex), only improved the harness: benchmark 52.8% → 66.5%, ranking from outside Top 30 → Top 5</li>
+            <li><strong>Stripe</strong> — Internal AI agents merging 1,000+ PRs per week</li>
+        </ul>
+        <p class="reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem); font-size:var(--small-size); color:var(--text-tertiary);">Martin Fowler: "Harness Engineering includes context engineering, architectural constraints, and garbage collection."</p>
+    </div>
+</section>
+
+
+<!-- ====================================================
+     SLIDE 11: SECTION — 4. Centralized Skill Management for Harness Engineering
+     ==================================================== -->
+<section class="slide section-slide" id="sec-4" data-slide="10">
+    <div class="grid-bg-dark"></div>
+    <div class="slide-content" style="align-items:center; text-align:center;">
+        <p class="label reveal" style="color:var(--accent-light);">Section 04</p>
+        <h1 class="reveal" style="color:#fff;">Centralized Skill Management<br>for Harness Engineering</h1>
+    </div>
+    <div class="section-number section-number-dark">04</div>
+</section>
+
+
+<!-- SLIDE 12: Problem Recognition -->
+<section class="slide content-slide" data-slide="11">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">4-1</p>
+        <h2 class="reveal">Problem: We Want the Same Skills on Both Sides</h2>
+        <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">I use both Claude Code Enterprise and Codex Enterprise, so any harness change must be applied to both. This is why centralized management is essential.</p>
+        <ul class="bullets reveal" style="margin-top:clamp(0.4rem,0.8vw,0.6rem);">
+            <li>Claude Code: Install via <code>/plugin</code> → saved in <code>~/.claude/plugins/cache</code>, auto-injected into System Prompt</li>
+            <li>Plugins installed via <code>/plugin</code> don't show in <code>/skills</code>; check via <code>/context</code> instead</li>
+            <li>Auto-update is a nice benefit, but...</li>
+            <li><strong>Codex doesn't have a Marketplace yet</strong> → creates a management issue across both tools</li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- SLIDE 13: Management Approach Comparison -->
+<section class="slide content-slide" data-slide="12">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">4-2</p>
+        <h2 class="reveal">Management Approach Comparison</h2>
+        <table class="slide-table reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <tr><th>Tool</th><th>Central Management</th><th>Claude/Codex Dual Support</th><th>Verdict</th></tr>
+            <tr><td><strong>skills.sh</strong></td><td>Web registry + CLI</td><td>Officially supported</td><td style="color:var(--accent);font-weight:700;">Most polished choice</td></tr>
+            <tr><td><strong>OpenSkills</strong></td><td>GitHub-based loader</td><td>Support stated</td><td>General-purpose package manager</td></tr>
+            <tr><td><strong>SkillDeck</strong></td><td>Local GUI app</td><td>Support included</td><td>Fine for personal Mac, not ideal for teams</td></tr>
+            <tr><td><strong>installagentskills</strong></td><td>Catalog-style</td><td>Guide only</td><td>Decision support tool</td></tr>
+        </table>
+    </div>
+</section>
+
+
+<!-- SLIDE 14: Final Choice -->
+<section class="slide content-slide" data-slide="13">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">4-3</p>
+        <h2 class="reveal">Final Choice: skills.sh</h2>
+        <ul class="bullets reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <li>SkillDeck offers intuitive management with a clean GUI on Mac, but</li>
+            <li>since we're comfortable with the terminal, we chose <strong>skills.sh</strong></li>
+            <li>Keep up to date with <code>npx skills check</code> and <code>npx skills update</code></li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- SLIDE 14.5: Harness Comparison — Why gstack -->
+<section class="slide content-slide" data-slide="13b">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">4-3b</p>
+        <h2 class="reveal">Why gstack as the Harness</h2>
+        <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">I've already tried superpowers, bkit, omx and others, but <strong>gstack</strong> felt like the best fit for my style — so I decided to go with gstack as my main harness this time. I'll cover gstack in more detail later on.</p>
+        <table class="slide-table reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <tr><th>Tool</th><th>Strengths</th><th>Weaknesses</th></tr>
+
+            <tr><td><strong>superpowers</strong></td><td>Rich skill bundles, active community</td><td>Not opinionated — weak process enforcement, no browser automation</td></tr>
+            <tr><td><strong>bkit</strong></td><td>Highly versatile, flexible extension</td><td>No sprint workflow, no QA/deploy pipeline</td></tr>
+            <tr><td style="color:var(--accent);font-weight:700;">gstack</td><td style="color:var(--accent);">Full lifecycle structure (plan→review→QA→ship→retro), 100ms persistent browser, parallel sprints</td><td>Heavily opinionated, macOS-centric cookie decryption, no iframe support</td></tr>
+        </table>
+        <div class="highlight-box reveal" style="margin-top:clamp(0.4rem,0.8vw,0.6rem);">
+            <p>Deciding factor: the only option with <strong>process enforcement + browser automation + quality gates</strong> all in one.</p>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 15: Core Skills Installed 1 -->
+<section class="slide content-slide" data-slide="14">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">4-4</p>
+        <h2 class="reveal">Core Skills Installed (1/2)</h2>
+        <div class="code-block reveal" style="position:relative; margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <span class="code-lang">bash</span>
+            <code>npx skills add https://github.com/anthropics/skills --skill <span class="str">skill-creator</span>
+npx skills add https://github.com/anthropics/skills --skill <span class="str">pdf</span>
+npx skills add https://github.com/anthropics/skills --skill <span class="str">xlsx</span>
+npx skills add https://github.com/anthropics/skills --skill <span class="str">mcp-builder</span>
+npx skills add https://github.com/anthropics/skills --skill <span class="str">frontend-design</span>
+npx skills add https://github.com/obra/superpowers --skill <span class="str">using-superpowers</span></code>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 16: Core Skills Installed 2 -->
+<section class="slide content-slide" data-slide="15">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">4-5</p>
+        <h2 class="reveal">Core Skills Installed (2/2)</h2>
+        <div class="code-block reveal" style="position:relative; margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <span class="code-lang">bash</span>
+            <code>npx skills add <span class="str">vercel/vercel</span>
+npx skills add https://github.com/vercel-labs/agent-skills --skill <span class="str">vercel-react-best-practices</span>
+npx skills add https://github.com/vercel-labs/agent-skills --skill <span class="str">web-design-guidelines</span>
+npx skills add https://github.com/zarazhangrui/frontend-slides --skill <span class="str">frontend-slides</span>
+npx skills add https://github.com/garrytan/gstack.git --skill <span class="str">gstack</span>
+npx skills add https://github.com/supercent-io/skills-template --skill <span class="str">ralph</span>
+npx skills add https://github.com/obra/superpowers --skill <span class="str">using-superpowers</span></code>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 17: Installation Options -->
+<section class="slide content-slide" data-slide="16">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">4-6</p>
+        <h2 class="reveal">Installation Options: Global + Symbolic Link</h2>
+        <ul class="bullets reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <li>Git clone into <code>~/.agents/skills</code> → symbolic link to <code>~/.claude/skills</code></li>
+            <li>When a new version is released, both sides (Claude Code & Codex) update simultaneously</li>
+            <li>Codex automatically references <code>~/.agents/skills</code>, so no separate linking is needed</li>
+        </ul>
+        <div class="highlight-box reveal" style="margin-top:clamp(0.6rem,1vw,1rem);">
+            <p>Codex's built-in Skill Creator / Skill Installer are outperformed by Vercel's find-skills and Anthropic's skill-creator, so <strong>disabling them is recommended.</strong></p>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 18: Claude Hud -->
+<section class="slide content-slide" data-slide="17">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">4-7</p>
+        <h2 class="reveal">Claude Hud (Claude Code Only)</h2>
+        <ul class="bullets reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <li>Displays usage, model, branch, current directory, etc. in a bottom status bar</li>
+            <li>Installed separately for the Claude Code environment only</li>
+        </ul>
+        <div class="reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <img src="images/claude-hud-preview.png" alt="Claude HUD preview" style="max-width:100%; border-radius:8px; box-shadow:0 2px 12px rgba(0,0,0,0.10);">
+        </div>
+        <p class="reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem); font-size:var(--small-size); color:var(--text-tertiary);">GitHub: <a href="https://github.com/jarrodwatts/claude-hud" target="_blank" style="color:var(--accent-light); text-decoration:none;">github.com/jarrodwatts/claude-hud</a></p>
+    </div>
+</section>
+
+
+<!-- ====================================================
+     SLIDE 19: SECTION — 5. gstack Deep Dive
+     ==================================================== -->
+<section class="slide section-slide" id="sec-5" data-slide="18">
+    <div class="grid-bg-dark"></div>
+    <div class="slide-content" style="align-items:center; text-align:center;">
+        <p class="label reveal" style="color:var(--accent-light);">Section 05</p>
+        <h1 class="reveal" style="color:#fff;">gstack<br>Deep Dive</h1>
+    </div>
+    <div class="section-number section-number-dark">05</div>
+</section>
+
+
+<!-- SLIDE 20: What is gstack -->
+<section class="slide content-slide" data-slide="19">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">5-1</p>
+        <h2 class="reveal">What is gstack?</h2>
+        <div class="highlight-box reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <p>"A skill pack + ultra-fast browser automation tool that makes AI coding agents operate like a <strong>virtual development team with separated roles</strong>, rather than a chatbot assistant."</p>
+        </div>
+        <p class="reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">The key isn't a new model — it's that it <strong>strongly structures the development process</strong>.</p>
+        <p class="reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem); font-size:var(--small-size); color:var(--text-tertiary);">GitHub: <a href="https://github.com/garrytan/gstack" target="_blank" style="color:var(--accent-light); text-decoration:none;">github.com/garrytan/gstack</a></p>
+    </div>
+</section>
+
+
+<!-- SLIDE 21: Three Core Components -->
+<section class="slide content-slide" data-slide="20">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">5-2</p>
+        <h2 class="reveal">Core Components of gstack</h2>
+        <ol class="reveal" style="padding-left:1.5em; margin-top:clamp(0.5rem,1vw,0.8rem); list-style:decimal;">
+            <li><strong>SKILL.md-based workflow skills</strong></li>
+            <li><strong>Persistent browser daemon</strong> built with Bun + Playwright</li>
+            <li><strong>Scripts</strong> that install, sync, and validate these two</li>
+        </ol>
+        <div class="highlight-box reveal" style="margin-top:clamp(0.6rem,1vw,1rem);">
+            <p>Strip away the marketing, and the essence is <strong>"a prompt operating system + fast browser QA"</strong></p>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 22: Why Use It -->
+<section class="slide content-slide" data-slide="21">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">5-3</p>
+        <h2 class="reveal">Why Use It</h2>
+        <div class="two-col reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <div>
+                <h3 style="font-size:var(--body-size); margin-bottom:0.3rem;">Process Enforcement</h3>
+                <p>Forces planning → design → implementation → review → QA → deploy → retro via imperative skills</p>
+            </div>
+            <div>
+                <h3 style="font-size:var(--body-size); margin-bottom:0.3rem;">Fast Browser</h3>
+                <p>Keeps Chromium alive once launched; subsequent commands take <strong>100-200ms</strong></p>
+            </div>
+            <div>
+                <h3 style="font-size:var(--body-size); margin-bottom:0.3rem;">Parallel Work</h3>
+                <p>Independent browser/state/logs per workspace</p>
+            </div>
+            <div>
+                <h3 style="font-size:var(--body-size); margin-bottom:0.3rem;">Quality Gates</h3>
+                <p>Bundles not just code, but bugs, tests, docs, and releases together</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 23: Installation -->
+<section class="slide content-slide" data-slide="22">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">5-4</p>
+        <h2 class="reveal">Installation</h2>
+        <div class="two-col reveal">
+            <div>
+                <h3 style="font-size:var(--body-size); margin-bottom:0.3rem;">Claude Code</h3>
+                <div class="code-block" style="margin-top:0.3rem;"><code><span class="kw">git clone</span> ...gstack.git ~/.claude/skills/gstack
+<span class="kw">cd</span> ~/.claude/skills/gstack && ./setup</code></div>
+            </div>
+            <div>
+                <h3 style="font-size:var(--body-size); margin-bottom:0.3rem;">Codex</h3>
+                <div class="code-block" style="margin-top:0.3rem;"><code><span class="kw">git clone</span> ...gstack.git ~/.codex/skills/gstack
+<span class="kw">cd</span> ~/.codex/skills/gstack && ./setup --host codex</code></div>
+            </div>
+        </div>
+        <ul class="bullets reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <li>./setup: Check Bun → build browse → Playwright Chromium → create symlinks → prepare state directory</li>
+            <li>Requirements: <strong>Git, Bun, host agent</strong></li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- SLIDE 24: Actual Usage Flow -->
+<section class="slide content-slide" data-slide="23">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">5-5</p>
+        <h2 class="reveal">Actual Usage Flow</h2>
+        <div class="flow reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <span class="flow-item">/office-hours</span><span class="flow-arrow">→</span>
+            <span class="flow-item">/plan-ceo-review</span><span class="flow-arrow">→</span>
+            <span class="flow-item">/plan-eng-review</span><span class="flow-arrow">→</span>
+            <span class="flow-item">/plan-design-review</span>
+        </div>
+        <div class="flow reveal" style="margin-top:clamp(0.3rem,0.5vw,0.4rem);">
+            <span class="flow-arrow">→</span>
+            <span class="flow-item" style="background:var(--accent); color:#fff;">Implementation (direct instruction)</span><span class="flow-arrow">→</span>
+            <span class="flow-item">/investigate</span>
+        </div>
+        <div class="flow reveal" style="margin-top:clamp(0.3rem,0.5vw,0.4rem);">
+            <span class="flow-arrow">→</span>
+            <span class="flow-item">/qa</span><span class="flow-arrow">→</span>
+            <span class="flow-item">/review</span><span class="flow-arrow">→</span>
+            <span class="flow-item">/ship</span><span class="flow-arrow">→</span>
+            <span class="flow-item">/document-release</span><span class="flow-arrow">→</span>
+            <span class="flow-item">/retro</span>
+        </div>
+        <div class="highlight-box reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <p>gstack is not a "collection of commands" — it's essentially a <strong>sprint operation protocol</strong>. There is no dedicated "implementation" skill; after plan review, you instruct Claude Code to implement directly.</p>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 25: Key Skill Roles 1 -->
+<section class="slide content-slide" data-slide="24">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">5-6</p>
+        <h2 class="reveal">Key Skill Roles</h2>
+        <ul class="bullets reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <li><strong>/office-hours</strong> — Instead of taking feature requests at face value, reframes "what you're really trying to build"</li>
+            <li><strong>/plan-ceo-review</strong> — For broadening, narrowing, or realigning the product direction</li>
+            <li><strong>/plan-eng-review</strong> — For locking down architecture, data flow, failure cases, and test plans</li>
+            <li><strong>/plan-design-review</strong> — For raising design completeness before implementation</li>
+            <li><strong>/design-consultation</strong> — For creating a design system from scratch</li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- SLIDE 26: Key Skill Roles 2 -->
+<section class="slide content-slide" data-slide="25">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">5-7</p>
+        <h2 class="reveal">Post-Implementation Workflow Skills</h2>
+        <ul class="bullets reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <li><strong>/review</strong> — Paranoid review that hunts for structural bugs</li>
+            <li><strong>/qa</strong> — Runs actual browser tests; auto-fixes bugs on discovery → re-verifies</li>
+            <li><strong>/ship</strong> — PR/test/coverage/release wrap-up. Bootstraps test frameworks if none exist</li>
+            <li><strong>/document-release</strong> — Catches documentation drift in README, CONTRIBUTING, etc.</li>
+            <li><strong>/retro</strong> — Weekly retrospective and team/individual metrics analysis</li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- SLIDE 27: /browse Architecture -->
+<section class="slide content-slide" data-slide="26">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">5-8</p>
+        <h2 class="reveal">Why the Browser Matters — /browse</h2>
+        <ul class="bullets reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <li>Not a CLI wrapping Playwright, but a <strong>thin client architecture that sends commands to a local HTTP daemon</strong></li>
+            <li>State file <code>.gstack/browse.json</code> records pid, port, and token</li>
+            <li>Security: <strong>localhost binding + bearer token + 0600 permissions</strong></li>
+            <li>Element selection: <code>snapshot -i</code> creates <code>@e1</code>, <code>@e2</code> refs (accessibility tree based)</li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- SLIDE 28: /browse Advanced Features -->
+<section class="slide content-slide" data-slide="27">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">5-9</p>
+        <h2 class="reveal">/browse Advanced Features</h2>
+        <ul class="bullets reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <li>SPA ref expiry → detected via <code>locator.count()</code>, returns "take a new snapshot" error</li>
+            <li>CAPTCHA/MFA → <strong>handoff</strong> to visible Chrome, user passes it, then <strong>resume</strong></li>
+            <li>"Persistent login, persistent tabs, persistent cookies, fast round-trips" — the key difference from MCP browser tools</li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- SLIDE 29: What Improves -->
+<section class="slide content-slide" data-slide="28">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">5-10</p>
+        <h2 class="reveal">What Improves</h2>
+        <table class="slide-table reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <tr><th>Area</th><th>Improvement</th></tr>
+            <tr><td>Planning Quality</td><td>Redefines feature requests as product problems</td></tr>
+            <tr><td>Implementation Quality</td><td>Enforces diagrams, failure modes, and test matrices</td></tr>
+            <tr><td>UI Quality</td><td>Strong aesthetic standards that reduce "AI slop"</td></tr>
+            <tr><td>QA Quality</td><td>Real browser clicks → issues → fixes → regression tests</td></tr>
+            <tr><td>Deployment Quality</td><td>Bootstraps test frameworks if none exist</td></tr>
+            <tr><td>Documentation Quality</td><td>Auto-detects and fixes documentation drift</td></tr>
+            <tr><td>Multi-agent</td><td>Parallel sprint operation with Conductor</td></tr>
+        </table>
+    </div>
+</section>
+
+
+<!-- SLIDE 30: Full Skill List 1 -->
+<section class="slide content-slide" data-slide="29">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">5-11</p>
+        <h2 class="reveal">Full Skill List (1/3)</h2>
+        <table class="slide-table reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <tr><th>Skill</th><th>Description</th></tr>
+            <tr><td><code>/office-hours</code></td><td>Initial interview / reframing</td></tr>
+            <tr><td><code>/plan-ceo-review</code></td><td>Founder-perspective redesign</td></tr>
+            <tr><td><code>/plan-eng-review</code></td><td>Architecture, data flow, test plan</td></tr>
+            <tr><td><code>/plan-design-review</code></td><td>Design completeness check</td></tr>
+            <tr><td><code>/design-consultation</code></td><td>Design system creation</td></tr>
+            <tr><td><code>/review</code></td><td>Paranoid structural bug review</td></tr>
+            <tr><td><code>/investigate</code></td><td>No guessing — root-cause-first debugging</td></tr>
+        </table>
+    </div>
+</section>
+
+
+<!-- SLIDE 31: Full Skill List 2 -->
+<section class="slide content-slide" data-slide="30">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">5-12</p>
+        <h2 class="reveal">Full Skill List (2/3)</h2>
+        <table class="slide-table reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <tr><th>Skill</th><th>Description</th></tr>
+            <tr><td><code>/design-review</code></td><td>Visual audit of the live site</td></tr>
+            <tr><td><code>/qa</code></td><td>Browser-based QA + regression testing</td></tr>
+            <tr><td><code>/qa-only</code></td><td>Bug report only, no fixes</td></tr>
+            <tr><td><code>/ship</code></td><td>Test → PR → release wrap-up</td></tr>
+            <tr><td><code>/document-release</code></td><td>Sync docs with code changes</td></tr>
+            <tr><td><code>/retro</code></td><td>Weekly retrospective + metrics analysis</td></tr>
+            <tr><td><code>/browse</code></td><td>High-speed persistent browser automation</td></tr>
+        </table>
+    </div>
+</section>
+
+
+<!-- SLIDE 32: Full Skill List 3 -->
+<section class="slide content-slide" data-slide="31">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">5-13</p>
+        <h2 class="reveal">Full Skill List (3/3)</h2>
+        <table class="slide-table reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <tr><th>Skill</th><th>Description</th></tr>
+            <tr><td><code>/setup-browser-cookies</code></td><td>Reuse sessions with real browser cookies</td></tr>
+            <tr><td><code>/codex</code></td><td>Independent second review via Codex CLI</td></tr>
+            <tr><td><code>/careful</code></td><td>Warns about destructive commands</td></tr>
+            <tr><td><code>/freeze</code></td><td>Restricts edits outside a specific directory</td></tr>
+            <tr><td><code>/guard</code></td><td>careful + freeze combined</td></tr>
+            <tr><td><code>/unfreeze</code></td><td>Lifts freeze restrictions</td></tr>
+            <tr><td><code>/gstack-upgrade</code></td><td>Detects install location and upgrades</td></tr>
+            <tr><td><code>/find-skills</code></td><td>Search for and install new skills</td></tr>
+        </table>
+    </div>
+</section>
+
+
+<!-- SLIDE 33: By Category — Planning -->
+<section class="slide content-slide" data-slide="32">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">5-14</p>
+        <h2 class="reveal">Category: Ideation & Planning</h2>
+        <table class="slide-table reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <tr><th>Skill</th><th>Purpose</th></tr>
+            <tr><td><code>/office-hours</code></td><td>Brainstorming, "Is this worth building?" assessment</td></tr>
+            <tr><td><code>/plan-ceo-review</code></td><td>Strategy-level plan review (scope expansion/reduction)</td></tr>
+            <tr><td><code>/plan-eng-review</code></td><td>Architecture/engineering perspective review</td></tr>
+            <tr><td><code>/plan-design-review</code></td><td>Design/UX perspective review</td></tr>
+        </table>
+    </div>
+</section>
+
+
+<!-- SLIDE 34: By Category — Design, Dev, Code Review -->
+<section class="slide content-slide" data-slide="33">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">5-15</p>
+        <h2 class="reveal">Category: Design / Development / Review</h2>
+        <div class="two-col reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <div>
+                <h3 style="font-size:var(--body-size); margin-bottom:0.3rem;">Design & UI</h3>
+                <ul class="bullets"><li>/design-consultation — Design system creation</li><li>/design-review — Visual QA</li></ul>
+            </div>
+            <div>
+                <h3 style="font-size:var(--body-size); margin-bottom:0.3rem;">Development & Debugging</h3>
+                <ul class="bullets"><li>/investigate — Root cause analysis</li><li>/browse — Headless browser testing</li></ul>
+            </div>
+            <div>
+                <h3 style="font-size:var(--body-size); margin-bottom:0.3rem;">Code Review & Deployment</h3>
+                <ul class="bullets"><li>/review — PR code review</li><li>/codex — Second opinion</li><li>/ship — One-stop deployment</li></ul>
+            </div>
+            <div>
+                <h3 style="font-size:var(--body-size); margin-bottom:0.3rem;">Testing & QA</h3>
+                <ul class="bullets"><li>/qa — QA + auto-fix</li><li>/qa-only — Report only</li></ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 35: By Category — Safety & Others -->
+<section class="slide content-slide" data-slide="34">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">5-16</p>
+        <h2 class="reveal">Category: Safety Mode & Others</h2>
+        <div class="two-col reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <div>
+                <h3 style="font-size:var(--body-size); margin-bottom:0.3rem;">Safety Mode</h3>
+                <ul class="bullets"><li>/careful — Warns about dangerous commands</li><li>/freeze — Restricts directory edits</li><li>/guard — careful + freeze (maximum safety)</li><li>/unfreeze — Lifts freeze</li></ul>
+            </div>
+            <div>
+                <h3 style="font-size:var(--body-size); margin-bottom:0.3rem;">Others</h3>
+                <ul class="bullets"><li>/retro — Weekly retrospective</li><li>/document-release — Post-deployment docs</li><li>/setup-browser-cookies — Cookie import</li><li>/find-skills — Skill search</li></ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 36: /browse Usage -->
+<section class="slide content-slide" data-slide="35">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">5-17</p>
+        <h2 class="reveal">/browse Quick Usage</h2>
+        <div class="code-block reveal" style="position:relative; margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <span class="code-lang">bash</span>
+            <code><span class="cmt"># Open a page</span>
+$B goto https://example.com
+<span class="cmt"># Check interactive elements</span>
+$B snapshot -i
+<span class="cmt"># Click / input</span>
+$B click @e3
+$B fill @e4 <span class="str">"value"</span>
+<span class="cmt"># diff / screenshot / responsive</span>
+$B snapshot -D
+$B screenshot /tmp/result.png
+$B responsive /tmp/layout</code>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 37: Limitations and Caveats -->
+<section class="slide content-slide" data-slide="36">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">5-18</p>
+        <h2 class="reveal">Limitations and Caveats</h2>
+        <ul class="bullets reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <li><strong>Strongly opinionated</strong> — Can feel restrictive if you don't align with Garry Tan's development culture</li>
+            <li>Most of the core logic lives in prompt/skill markdown → more "operating rules" than "engine"</li>
+            <li>Cookie decryption is <strong>macOS Keychain-centric</strong> (Windows/Linux not implemented)</li>
+            <li><strong>No iframe support</strong> (most-requested missing feature)</li>
+            <li>On non-Claude hosts, /careful etc. degrade to advisory prose</li>
+            <li>Telemetry is opt-in but exists — collects skill name, time, result, version, OS</li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- SLIDE 38: gstack Conclusion -->
+<section class="slide content-slide" data-slide="37">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">5-19</p>
+        <h2 class="reveal">gstack Conclusion</h2>
+        <div class="highlight-box reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <p>gstack is not "a tool that makes AI smarter" — it's <strong>"a way to run AI like a team."</strong></p>
+        </div>
+        <ul class="bullets reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <li>The biggest improvement comes from <strong>operational structure</strong>, not the model</li>
+            <li>Redefining plans → splitting review/QA/docs/release into skills → browser → parallel sprints</li>
+            <li>Better suited for <strong>founders, tech leads, and solo developers who need strong process and role separation</strong> than general-purpose agents with high degrees of freedom</li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- ====================================================
+     SLIDE 39: SECTION — 6. CLAUDE.md / AGENTS.md Configuration
+     ==================================================== -->
+<section class="slide section-slide" id="sec-6" data-slide="38">
+    <div class="grid-bg-dark"></div>
+    <div class="slide-content" style="align-items:center; text-align:center;">
+        <p class="label reveal" style="color:var(--accent-light);">Section 06</p>
+        <h1 class="reveal" style="color:#fff;">CLAUDE.md<br>AGENTS.md Configuration</h1>
+    </div>
+    <div class="section-number section-number-dark">06</div>
+</section>
+
+
+
+
+<!-- SLIDE 41: Recommended CLAUDE.md / AGENTS.md Structure -->
+<section class="slide content-slide" data-slide="40">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">6-1</p>
+        <h2 class="reveal">Recommended CLAUDE.md / AGENTS.md Structure</h2>
+        <ul class="bullets reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <li>Use <strong>Andrej Karpathy's concise CLAUDE.md</strong> as the main template</li>
+            <li>4 core principles: Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution</li>
+            <li>Add Gstack directives</li>
+            <li>Add sub-agent mode directives</li>
+            <li>Add RTK directives (<code>@RTK.md</code> reference)</li>
+            <li>Since RTK currently only works with Claude Code, just remove RTK.md to use the same structure for <code>~/.codex/AGENTS.md</code></li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- SLIDE: Why Karpathy's CLAUDE.md Went Viral -->
+<section class="slide content-slide" data-slide="41">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">6-1+</p>
+        <h2 class="reveal">Why Karpathy's CLAUDE.md Went Viral</h2>
+        <ul class="bullets reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <li>Just <strong>4 principles</strong> that directly target AI coding agents' chronic problems: over-engineering, unnecessary refactoring, and speculative code</li>
+            <li>"Would a senior engineer say this is overcomplicated? If yes, simplify." — this single line went viral across developer communities</li>
+            <li>Unlike long, verbose CLAUDE.md files, <strong>short and specific behavioral rules</strong> alone made a visible difference in code quality</li>
+            <li>The key insight: instead of telling AI "how to code," clearly define <strong>"what not to do"</strong></li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- SLIDE 42: Think Before Coding -->
+<section class="slide content-slide" data-slide="41">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">6-2</p>
+        <h2 class="reveal">Karpathy's Principle 1: Think Before Coding</h2>
+        <h3 class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem); font-size:var(--body-size);">Don't assume. Don't hide confusion. Surface tradeoffs.</h3>
+        <ul class="bullets reveal" style="margin-top:clamp(0.4rem,0.8vw,0.6rem);">
+            <li>State assumptions explicitly. If uncertain, ask.</li>
+            <li>If multiple interpretations exist, present them all — don't silently pick one</li>
+            <li>If a simpler approach exists, say so. Push back when warranted.</li>
+            <li>If something is unclear, stop. Name what's confusing.</li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- SLIDE 43: Simplicity First -->
+<section class="slide content-slide" data-slide="42">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">6-3</p>
+        <h2 class="reveal">Karpathy's Principle 2: Simplicity First</h2>
+        <h3 class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem); font-size:var(--body-size);">Minimum code that solves the problem. Nothing speculative.</h3>
+        <ul class="bullets reveal" style="margin-top:clamp(0.4rem,0.8vw,0.6rem);">
+            <li>No features beyond what was asked</li>
+            <li>No abstractions for single-use code</li>
+            <li>No unrequested "flexibility" or "configurability"</li>
+            <li>No error handling for impossible scenarios</li>
+            <li>If 200 lines can be 50, rewrite it</li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- SLIDE 44: Surgical Changes -->
+<section class="slide content-slide" data-slide="43">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">6-4</p>
+        <h2 class="reveal">Karpathy's Principle 3: Surgical Changes</h2>
+        <h3 class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem); font-size:var(--body-size);">Touch only what you must. Clean up only your own mess.</h3>
+        <ul class="bullets reveal" style="margin-top:clamp(0.4rem,0.8vw,0.6rem);">
+            <li>Don't "improve" adjacent code, comments, or formatting</li>
+            <li>Don't refactor things that aren't broken</li>
+            <li>Match existing style, even if you'd do it differently</li>
+            <li>Only remove orphans your changes created. Mention pre-existing dead code, don't delete it.</li>
+        </ul>
+        <div class="highlight-box reveal" style="margin-top:clamp(0.4rem,0.8vw,0.6rem);">
+            <p>The test: <strong>Every changed line should trace directly to the user's request.</strong></p>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 45: Goal-Driven Execution -->
+<section class="slide content-slide" data-slide="44">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">6-5</p>
+        <h2 class="reveal">Karpathy's Principle 4: Goal-Driven Execution</h2>
+        <h3 class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem); font-size:var(--body-size);">Define success criteria. Loop until verified.</h3>
+        <ul class="bullets reveal" style="margin-top:clamp(0.4rem,0.8vw,0.6rem);">
+            <li>"Add validation" → "Write tests for invalid inputs, then make them pass"</li>
+            <li>"Fix the bug" → "Write a reproduction test, then make it pass"</li>
+            <li>"Refactor X" → "Ensure tests pass before and after"</li>
+        </ul>
+        <div class="code-block reveal" style="margin-top:clamp(0.4rem,0.8vw,0.6rem);"><code>1. [Step] → verify: [check]
+2. [Step] → verify: [check]
+3. [Step] → verify: [check]</code></div>
+    </div>
+</section>
+
+
+<!-- SLIDE: Gstack Directive in CLAUDE.md -->
+<section class="slide content-slide" data-slide="45">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">6-6</p>
+        <h2 class="reveal">Gstack Directive for CLAUDE.md &amp; AGENTS.md</h2>
+        <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">Add the following from the gstack GitHub README.md to the bottom of your CLAUDE.md &amp; AGENTS.md.</p>
+        <div class="code-block reveal" style="position:relative; margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <span class="code-lang">markdown</span>
+            <code><span class="comment"># Gstack</span>
+To use the /browse skill from gstack for all web browsing,
+never use mcp__claude-in-chrome__* tools, and lists the
+available skills: /office-hours, /plan-ceo-review,
+/plan-eng-review, /plan-design-review, /design-consultation,
+/review, /ship, /browse, /qa, /qa-only, /design-review,
+/setup-browser-cookies, /retro, /investigate,
+/document-release, /codex, /careful, /freeze, /guard,
+/unfreeze, /gstack-upgrade.</code>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE: Subagent Directive in CLAUDE.md -->
+<section class="slide content-slide" data-slide="46">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">6-7</p>
+        <h2 class="reveal">Sub-Agent Directive</h2>
+        <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">You can implement from a finalized PRD using Ralph, but there's also the sub-agent approach. For this case, add the sub-agent directive as well.</p>
+        <div class="code-block reveal" style="position:relative; margin-top:clamp(0.5rem,1vw,0.8rem); font-size:clamp(0.55rem, 0.9vw, 0.8rem);">
+            <span class="code-lang">markdown</span>
+            <code><span class="comment"># Subagent-Based Workflow</span>
+
+<span class="keyword">**Load skills**</span>: `superpowers:executing-plans`,
+  `superpowers:dispatching-parallel-agents`
+
+<span class="comment">## Principle</span>
+The main context should be handled only by the orchestrator.
+All implementation and review work should be delegated to subagents.
+
+<span class="comment">## Task Loop</span>
+| Step | Owner | Description |
+| 1. Planning | Opus 4.6 subagent | Create implementation plan |
+| 2. Implementation | Sonnet 4.6 subagent | Write code |
+| 3. Review | Opus 4.6 subagent | Run /simplify &amp; fix |
+| 4. Commit | Main | Commit &amp; mark complete |</code>
+        </div>
+        <p class="reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">Enter the following prompt for a plan document generated by gstack:</p>
+        <div class="code-block reveal" style="position:relative; margin-top:clamp(0.3rem,0.6vw,0.5rem);">
+            <code>{plan document path} 를 서브에이전트 기반으로 작업해줘.</code>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE: Final CLAUDE.md & AGENTS.md -->
+<section class="slide content-slide" data-slide="47">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">6-8</p>
+        <h2 class="reveal">Final CLAUDE.md &amp; AGENTS.md Structure</h2>
+        <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">Only CLAUDE.md has <code>@RTK.md</code> at the very last line.</p>
+        <div class="code-block reveal" style="position:relative; margin-top:clamp(0.4rem,0.8vw,0.6rem); font-size:clamp(0.45rem, 0.7vw, 0.65rem); max-height:75vh; overflow-y:auto;">
+            <span class="code-lang">markdown</span>
+            <code><span class="comment"># CLAUDE.md</span>
+
+Behavioral guidelines to reduce common LLM coding mistakes.
+Merge with project-specific instructions as needed.
+
+<span class="keyword">**Tradeoff:**</span> These guidelines bias toward caution over speed.
+For trivial tasks, use judgment.
+
+<span class="comment">## 1. Think Before Coding</span>
+<span class="keyword">**Don't assume. Don't hide confusion. Surface tradeoffs.**</span>
+- State your assumptions explicitly. If uncertain, ask.
+- If multiple interpretations exist, present them - don't pick silently.
+- If a simpler approach exists, say so. Push back when warranted.
+- If something is unclear, stop. Name what's confusing. Ask.
+
+<span class="comment">## 2. Simplicity First</span>
+<span class="keyword">**Minimum code that solves the problem. Nothing speculative.**</span>
+- No features beyond what was asked.
+- No abstractions for single-use code.
+- No "flexibility" or "configurability" that wasn't requested.
+- If you write 200 lines and it could be 50, rewrite it.
+
+<span class="comment">## 3. Surgical Changes</span>
+<span class="keyword">**Touch only what you must. Clean up only your own mess.**</span>
+- Don't "improve" adjacent code, comments, or formatting.
+- Don't refactor things that aren't broken.
+- Match existing style, even if you'd do it differently.
+- Remove imports/variables/functions that YOUR changes made unused.
+
+<span class="comment">## 4. Goal-Driven Execution</span>
+<span class="keyword">**Define success criteria. Loop until verified.**</span>
+- "Add validation" → "Write tests for invalid inputs, then make them pass"
+- "Fix the bug" → "Write a test that reproduces it, then make it pass"
+- "Refactor X" → "Ensure tests pass before and after"
+
+---
+
+<span class="comment"># Gstack</span>
+To use the /browse skill from gstack for all web browsing,
+never use mcp__claude-in-chrome__* tools, and lists the
+available skills: /office-hours, /plan-ceo-review, ...
+
+<span class="comment"># Subagent-Based Workflow</span>
+<span class="keyword">**Load skills**</span>: `superpowers:executing-plans`,
+  `superpowers:dispatching-parallel-agents`
+
+<span class="comment">## Principle</span>
+The main context → orchestrator only. Implementation → subagents.
+
+<span class="comment">## Task Loop</span>
+| Step | Owner | Description |
+| 1. Planning | Opus 4.6 | Create implementation plan |
+| 2. Implementation | Sonnet 4.6 | Write code |
+| 3. Review | Opus 4.6 | Run /simplify &amp; fix |
+| 4. Commit | Main | Commit &amp; mark complete |
+
+<span class="str">@RTK.md</span>  <span class="comment">← CLAUDE.md only (not in AGENTS.md)</span></code>
+        </div>
+    </div>
+</section>
+
+
+<!-- ====================================================
+     SLIDE 46: SECTION — 7. Hands-on Example
+     ==================================================== -->
+<section class="slide section-slide" id="sec-7" data-slide="45">
+    <div class="grid-bg-dark"></div>
+    <div class="slide-content" style="align-items:center; text-align:center;">
+        <p class="label reveal" style="color:var(--accent-light);">Section 07</p>
+        <h1 class="reveal" style="color:#fff;">Hands-on Example</h1>
+        <p class="subtitle reveal" style="color:rgba(255,255,255,0.5); margin-top:0.8rem;">Building a Todo Web App with gstack + Ralph</p>
+    </div>
+    <div class="section-number section-number-dark">07</div>
+</section>
+
+
+<!-- SLIDE 47: Step 1 office-hours -->
+<section class="slide content-slide" data-slide="46">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">Step 1</p>
+        <h2 class="reveal">Idea Refinement — /office-hours</h2>
+        <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">Claude asks Socratic questions:</p>
+        <ul class="bullets reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">
+            <li>"Why do you want to build this? What makes it different from existing Todo apps?"</li>
+            <li>"Who is the target user?"</li>
+            <li>"What is the narrowest entry point (wedge)?"</li>
+        </ul>
+        <div class="highlight-box reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <p>Idea crystallized → <strong>"A CLI-first Todo app for developers. The web dashboard is view-only."</strong></p>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 48: Step 2 ceo-review -->
+<section class="slide content-slide" data-slide="47">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">Step 2</p>
+        <h2 class="reveal">Strategy Review — /plan-ceo-review</h2>
+        <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">Plan review from a CEO/founder perspective:</p>
+        <ul class="bullets reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">
+            <li>"Do you really need a dashboard? Isn't CLI alone sufficient?"</li>
+            <li>"Wouldn't it be better to reduce scope and ship the MVP faster?"</li>
+        </ul>
+        <div class="highlight-box reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <p>Decision: <strong>Phase 1 is web CRUD only. CLI moves to Phase 2.</strong></p>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 49: Step 3 eng-review -->
+<section class="slide content-slide" data-slide="48">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">Step 3</p>
+        <h2 class="reveal">Engineering Review — /plan-eng-review</h2>
+        <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">Lock down the architecture:</p>
+        <ul class="bullets reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">
+            <li>Stack: Next.js 15 (App Router) + Prisma + SQLite</li>
+            <li>Model: <code>Todo { id, title, completed, createdAt, updatedAt }</code></li>
+            <li>API: <code>/api/todos</code> (GET, POST, PUT, DELETE)</li>
+            <li>Testing: Vitest + Playwright E2E</li>
+            <li>Edge cases: empty title, duplicates, concurrent edits</li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- SLIDE 50: Step 4 design -->
+<section class="slide content-slide" data-slide="49">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">Step 4</p>
+        <h2 class="reveal">Design System — /design-consultation</h2>
+        <ul class="bullets reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <li>Generate a minimal design system</li>
+            <li>Color palette, typography, spacing rules</li>
+            <li>Output: <code>DESIGN.md</code> + font/color preview page</li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- SLIDE 51: Step 5 Ralph Loop -->
+<section class="slide content-slide" data-slide="50">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">Step 5</p>
+        <h2 class="reveal">Implementation — Automated via Ralph Loop</h2>
+        <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">Stepping outside gstack's domain, <strong>Ralph</strong> enters the picture. With the plan finalized, hand off implementation to a Ralph loop.</p>
+        <div class="code-block reveal" style="position:relative; margin-top:clamp(0.4rem,0.8vw,0.6rem);">
+            <code>/ralph-loop <span class="str">"
+Phase 1: Project init (Next.js + Prisma)
+Phase 2: API implementation (/api/todos CRUD)
+Phase 3: UI implementation (follow DESIGN.md)
+Phase 4: Testing (Vitest + Playwright, coverage 80%+)
+"</span> --completion-promise <span class="str">"COMPLETE"</span> --max-iterations 30</code>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 52: What Ralph Does -->
+<section class="slide content-slide" data-slide="51">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">Step 5 (continued)</p>
+        <h2 class="reveal">What Ralph Does</h2>
+        <ol class="reveal" style="padding-left:1.5em; margin-top:clamp(0.5rem,1vw,0.8rem); list-style:decimal;">
+            <li>Implements Phases 1-4 in order</li>
+            <li>Runs tests → analyzes failures and fixes them</li>
+            <li>Re-runs tests → repeats</li>
+            <li>When all tests pass, outputs <code>COMPLETE</code> → loop terminates</li>
+        </ol>
+        <div class="highlight-box reveal" style="margin-top:clamp(0.6rem,1vw,1rem);">
+            <p>No human intervention needed. <strong>Run it overnight and check the results in the morning.</strong></p>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 53: Step 6-7 Review + Codex -->
+<section class="slide content-slide" data-slide="52">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">Step 6-7</p>
+        <h2 class="reveal">Code Review & Second Opinion</h2>
+        <div class="two-col reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <div>
+                <h3 style="font-size:var(--body-size); margin-bottom:0.3rem;">/review</h3>
+                <ul class="bullets"><li>Structural inspection of SQL safety, trust boundary violations, conditional side effects</li><li>Fix discovered issues</li></ul>
+            </div>
+            <div>
+                <h3 style="font-size:var(--body-size); margin-bottom:0.3rem;">/codex review</h3>
+                <ul class="bullets"><li>OpenAI Codex independently reviews the diff</li><li>Acts as a pass/fail gate</li></ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 54: Step 8-9 QA + Design Review -->
+<section class="slide content-slide" data-slide="53">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">Step 8-9</p>
+        <h2 class="reveal">QA Testing & Design Audit</h2>
+        <div class="two-col reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <div>
+                <h3 style="font-size:var(--body-size); margin-bottom:0.3rem;">/qa</h3>
+                <ul class="bullets"><li>Click through add/delete/complete Todo in a real browser</li><li>Catch broken UI, missing error handling</li><li>Bug → auto-fix → re-verify → commit</li></ul>
+            </div>
+            <div>
+                <h3 style="font-size:var(--body-size); margin-bottom:0.3rem;">/design-review</h3>
+                <ul class="bullets"><li>Capture live site screenshots</li><li>Check spacing, fonts, AI slop patterns</li><li>Fix visual issues directly in source</li></ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 55: Step 10-11 Ship + Docs -->
+<section class="slide content-slide" data-slide="54">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">Step 10-11</p>
+        <h2 class="reveal">Deployment & Documentation Sync</h2>
+        <div class="two-col reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <div>
+                <h3 style="font-size:var(--body-size); margin-bottom:0.3rem;">/ship</h3>
+                <ul class="bullets"><li>Merge to base branch</li><li>Re-run tests (confirm pass)</li><li>Diff review + VERSION bump</li><li>CHANGELOG → commit → push → PR</li></ul>
+            </div>
+            <div>
+                <h3 style="font-size:var(--body-size); margin-bottom:0.3rem;">/document-release</h3>
+                <ul class="bullets"><li>Verify README matches actual code</li><li>Update API docs, CONTRIBUTING</li><li>Clean up TODOs</li></ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 56: Step 12 Retro -->
+<section class="slide content-slide" data-slide="55">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">Step 12</p>
+        <h2 class="reveal">Retrospective — /retro</h2>
+        <ul class="bullets reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <li>Analyze commits from this sprint</li>
+            <li>Code quality metrics</li>
+            <li>Ralph loop iteration count — identify where the most blockers occurred</li>
+            <li>Derive improvement points for the next sprint</li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- SLIDE 57: Full Flow Summary -->
+<section class="slide content-slide" data-slide="56">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">Summary</p>
+        <h2 class="reveal">Full Flow Summary</h2>
+        <div class="flow reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <span class="flow-item">/office-hours</span><span class="flow-arrow">→</span>
+            <span class="flow-item">/plan-ceo-review</span><span class="flow-arrow">→</span>
+            <span class="flow-item">/plan-eng-review</span>
+        </div>
+        <div class="flow reveal" style="margin-top:0.3rem;">
+            <span class="flow-arrow">→</span>
+            <span class="flow-item">/design-consultation</span><span class="flow-arrow">→</span>
+            <span class="flow-item" style="background:var(--accent);color:#fff;">/ralph-loop ⟳</span>
+        </div>
+        <div class="flow reveal" style="margin-top:0.3rem;">
+            <span class="flow-arrow">→</span>
+            <span class="flow-item">/review</span><span class="flow-arrow">→</span>
+            <span class="flow-item">/codex</span><span class="flow-arrow">→</span>
+            <span class="flow-item">/qa</span><span class="flow-arrow">→</span>
+            <span class="flow-item">/design-review</span>
+        </div>
+        <div class="flow reveal" style="margin-top:0.3rem;">
+            <span class="flow-arrow">→</span>
+            <span class="flow-item">/ship</span><span class="flow-arrow">→</span>
+            <span class="flow-item">/document-release</span><span class="flow-arrow">→</span>
+            <span class="flow-item">/retro</span>
+        </div>
+        <div class="highlight-box reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <p><strong>gstack</strong> provides the process skeleton, <strong>Ralph</strong> provides the automated iteration loop. The key combination that lets a solo developer maintain team-level quality gates while automating implementation.</p>
+        </div>
+    </div>
+</section>
+
+
+<!-- ====================================================
+     SLIDE 58: SECTION — Appendix
+     ==================================================== -->
+<section class="slide section-slide" id="sec-a" data-slide="57">
+    <div class="grid-bg-dark"></div>
+    <div class="slide-content" style="align-items:center; text-align:center;">
+        <p class="label reveal" style="color:var(--accent-light);">Appendix</p>
+        <h1 class="reveal" style="color:#fff;">Claude Code<br>Internals</h1>
+    </div>
+    <div class="section-number section-number-dark">A</div>
+</section>
+
+
+<!-- SLIDE 59: .claude Operating Layers -->
+<section class="slide content-slide" data-slide="58">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">A.1</p>
+        <h2 class="reveal">.claude Is Not Just a Config Folder</h2>
+        <table class="slide-table reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <tr><th>Directory</th><th>Role</th></tr>
+            <tr><td><code>commands/</code></td><td>Workflow entry points</td></tr>
+            <tr><td><code>agents/</code></td><td>Isolated role-based workers</td></tr>
+            <tr><td><code>skills/</code></td><td>Reusable knowledge/procedures</td></tr>
+            <tr><td><code>hooks/</code></td><td>Event-driven automation</td></tr>
+            <tr><td><code>rules/</code></td><td>Context injection with fine-grained rules</td></tr>
+            <tr><td><code>settings.json</code></td><td>Controls permissions, UI, hooks, MCP</td></tr>
+            <tr><td><code>agent-memory/</code></td><td>Agent persistent memory</td></tr>
+        </table>
+    </div>
+</section>
+
+
+<!-- SLIDE 60: Core Design Philosophy -->
+<section class="slide content-slide" data-slide="59">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">A.2</p>
+        <h2 class="reveal">Core Design Philosophy</h2>
+        <div class="highlight-box reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <p><strong>Commands</strong> orchestrate the flow, <strong>Agents</strong> work independently, <strong>Skills</strong> provide reusable knowledge/procedures, and <strong>Hooks</strong> attach automation from the outside.</p>
+        </div>
+        <ul class="bullets reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <li>Root files to read alongside: <code>CLAUDE.md</code> + <code>.mcp.json</code></li>
+            <li>Looking at <code>.claude</code> alone only gives you half the picture</li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- SLIDE 61: commands/ -->
+<section class="slide content-slide" data-slide="60">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">A.3</p>
+        <h2 class="reveal">commands/ — Workflow Controllers</h2>
+        <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">Don't dump complex tasks into a single agent:</p>
+        <ol class="reveal" style="padding-left:1.5em; margin-top:clamp(0.3rem,0.6vw,0.5rem); list-style:decimal;">
+            <li><strong>Commands</strong> define the flow</li>
+            <li><strong>Agents</strong> handle independent tasks</li>
+            <li><strong>Skills</strong> provide reusable procedures</li>
+        </ol>
+        <ul class="bullets reveal" style="margin-top:clamp(0.4rem,0.8vw,0.6rem);">
+            <li>The flow is visible, and it's easy to insert user confirmation steps</li>
+            <li>No single role gets bloated, and reuse becomes straightforward</li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- SLIDE 62: agents/ -->
+<section class="slide content-slide" data-slide="61">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">A.4</p>
+        <h2 class="reveal">agents/ — Role-Based Workers</h2>
+        <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">Independent actors with "fresh isolated context".</p>
+        <table class="slide-table reveal" style="margin-top:clamp(0.4rem,0.8vw,0.6rem);">
+            <tr><th>Field</th><th>Description</th></tr>
+            <tr><td><code>name</code> / <code>description</code></td><td>Identifier / when to use it</td></tr>
+            <tr><td><code>allowedTools</code> / <code>model</code></td><td>Tool scope / haiku, sonnet, opus, inherit</td></tr>
+            <tr><td><code>maxTurns</code> / <code>skills</code></td><td>Max turns / skills to preload</td></tr>
+            <tr><td><code>memory</code> / <code>isolation</code></td><td>user, project, local / worktree</td></tr>
+        </table>
+        <div class="highlight-box reveal" style="margin-top:clamp(0.4rem,0.8vw,0.6rem);">
+            <p>Multiple small role-specific agents beat <strong>one large do-everything agent.</strong></p>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 63: skills/ -->
+<section class="slide content-slide" data-slide="62">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">A.5</p>
+        <h2 class="reveal">skills/ — Reusable Knowledge/Procedures</h2>
+        <div class="two-col reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <div>
+                <h3 style="font-size:var(--body-size); margin-bottom:0.3rem;">A. Direct Invocation</h3>
+                <p>Called by a command or user. Runs in the current context. Great for reusing common procedures.</p>
+            </div>
+            <div>
+                <h3 style="font-size:var(--body-size); margin-bottom:0.3rem;">B. Agent Preload</h3>
+                <p>Added to an agent's <code>skills:</code> field to inject at startup. "Working knowledge this agent needs." Can hide from menus with <code>user-invocable: false</code>.</p>
+            </div>
+        </div>
+        <div class="highlight-box reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <p>The description enters the initial context; full content loads only on invocation. Verbose descriptions just consume <strong>context budget</strong>.</p>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 64: hooks/ -->
+<section class="slide content-slide" data-slide="63">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">A.6</p>
+        <h2 class="reveal">hooks/ — Event-Driven Automation</h2>
+        <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">Runs <strong>outside</strong> the agentic loop, not inside it.</p>
+        <table class="slide-table reveal" style="margin-top:clamp(0.4rem,0.8vw,0.6rem);">
+            <tr><th>Event</th><th>Timing</th></tr>
+            <tr><td>PreToolUse / PostToolUse</td><td>Just before/after tool use</td></tr>
+            <tr><td>SessionStart / SessionEnd</td><td>Session start/end</td></tr>
+            <tr><td>SubagentStart / SubagentStop</td><td>Sub-agent lifecycle</td></tr>
+            <tr><td>TaskCompleted / WorktreeCreate</td><td>Task completed / worktree created</td></tr>
+        </table>
+        <p class="reveal" style="margin-top:clamp(0.4rem,0.8vw,0.6rem); font-size:var(--small-size);">This repo consolidates everything into a single <code>hooks.py</code> with on/off via config file — simple to deploy and share.</p>
+    </div>
+</section>
+
+
+<!-- SLIDE 65: rules/ + settings.json -->
+<section class="slide content-slide" data-slide="64">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">A.7</p>
+        <h2 class="reveal">rules/ & settings.json</h2>
+        <div class="two-col reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <div>
+                <h3 style="font-size:var(--body-size); margin-bottom:0.3rem;">rules/ — Modular Rules</h3>
+                <ul class="bullets"><li>Don't cram everything into CLAUDE.md</li><li>Separate rules that apply only to specific file groups</li><li>Keeps CLAUDE.md short</li></ul>
+            </div>
+            <div>
+                <h3 style="font-size:var(--body-size); margin-bottom:0.3rem;">settings.json — Global Control</h3>
+                <ul class="bullets"><li>Permissions: allow/ask/deny</li><li>plansDirectory, env vars, hooks</li><li>MCP auto-approval</li><li>"Manage both convenience and safety structurally"</li></ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 66: agent-memory/ -->
+<section class="slide content-slide" data-slide="65">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">A.8</p>
+        <h2 class="reveal">agent-memory/ — Dynamic Knowledge Accumulation</h2>
+        <table class="slide-table reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <tr><th>Mode</th><th>Scope</th></tr>
+            <tr><td><code>memory: project</code></td><td>Shared team asset</td></tr>
+            <tr><td><code>memory: user</code></td><td>User-global memory</td></tr>
+            <tr><td><code>memory: local</code></td><td>Personal, not committed to git</td></tr>
+        </table>
+        <div class="highlight-box reveal" style="margin-top:clamp(0.6rem,1vw,1rem);">
+            <p><strong>Skill</strong> = static <em>design knowledge</em> injected at startup<br>
+            <strong>Memory</strong> = dynamic <em>operational knowledge</em> accumulated while working<br>
+            Mixing both is the real-world pattern.</p>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 67: Command vs Agent vs Skill -->
+<section class="slide content-slide" data-slide="66">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">A.9</p>
+        <h2 class="reveal">Command vs Agent vs Skill</h2>
+        <table class="slide-table reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <tr><th>Item</th><th>When to Use</th><th>Context</th><th>Best Role</th></tr>
+            <tr><td><strong>Command</strong></td><td>User initiates directly</td><td>Current session</td><td>Entry point, sequencing</td></tr>
+            <tr><td><strong>Agent</strong></td><td>Independent role needed</td><td>New/isolated</td><td>Investigation, implementation, review</td></tr>
+            <tr><td><strong>Skill</strong></td><td>Reusable knowledge/procedure</td><td>Current/preload</td><td>Common task rules</td></tr>
+        </table>
+        <div class="highlight-box reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <p>Entry point → command / Role separation → agent / Reusable playbook → skill</p>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 68: Separation Criteria + Architecture Patterns -->
+<section class="slide content-slide" data-slide="67">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">A.10</p>
+        <h2 class="reveal">Separation Criteria & Architecture Patterns</h2>
+        <ul class="bullets reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <li><code>CLAUDE.md</code> = high-level principles / <code>rules/</code> = narrow-scope rules</li>
+            <li>Skill = "what you know from the start" / Memory = "what you learn while working"</li>
+            <li><code>settings.json</code> = Claude behavior control / <code>.mcp.json</code> = external server connections</li>
+        </ul>
+        <div class="highlight-box reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <p>Representative pattern: <strong>Command → Agent (with preloaded skill) → Skill</strong><br>
+            Example: /weather-orchestrator → weather-agent(weather-fetcher preload) → weather-svg-creator</p>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 69: Best Practice 1-3 -->
+<section class="slide content-slide" data-slide="68">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">A.11</p>
+        <h2 class="reveal">Best Practice (1-3)</h2>
+        <ul class="bullets reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <li><strong>1. Keep CLAUDE.md short and strong</strong> — No giant wikis. Around 200 lines. Move details to rules/.</li>
+            <li><strong>2. Role-specific agents over general-purpose ones</strong> — Narrow permissions, separate memory, reduce prompt drift.</li>
+            <li><strong>3. Skills use progressive disclosure</strong> — Don't inject all knowledge at all times; pull it in only when needed.</li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- SLIDE 70: Best Practice 4-6 -->
+<section class="slide content-slide" data-slide="69">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">A.12</p>
+        <h2 class="reveal">Best Practice (4-6)</h2>
+        <ul class="bullets reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <li><strong>4. Hooks excel at "post-processing"</strong> — PostToolUse for formatting, Stop for verification reminders.</li>
+            <li><strong>5. Manage permissions with wildcards</strong> — <code>Bash(npm run *)</code>, <code>Edit(/docs/**)</code> patterns allowed. Destructive actions → ask/deny. "Intentionally narrow" is the default.</li>
+            <li><strong>6. Monorepos need hierarchical design</strong> — Root CLAUDE.md (shared) + per-package CLAUDE.md (domain-specific). Don't dump everything in one place.</li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- SLIDE 71: Best Practice 7-8 -->
+<section class="slide content-slide" data-slide="70">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">A.13</p>
+        <h2 class="reveal">Best Practice (7-8)</h2>
+        <ul class="bullets reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <li><strong>7. Break tasks small and manage context</strong> — Start with plan mode, /compact around 50%, finish subtasks under 50%, commit often. The reason to split agents/skills/rules well is ultimately context management.</li>
+            <li><strong>8. Put human approval points in commands</strong> — Pre-deployment confirmation, destructive action confirmation, option selection. Delegating everything to agents erodes operational control.</li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- SLIDE 72: Recommended Project Structure -->
+<section class="slide content-slide" data-slide="71">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">A.14</p>
+        <h2 class="reveal">Recommended Project Structure for Production</h2>
+        <div class="code-block reveal" style="position:relative; margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <code>project/
+├── CLAUDE.md          <span class="cmt"># Short high-level rules</span>
+├── .mcp.json          <span class="cmt"># External server connections</span>
+└── .claude/
+    ├── settings.json / settings.local.json
+    ├── rules/         <span class="cmt"># Domain-specific detailed rules</span>
+    ├── commands/       <span class="cmt"># Human-initiated workflows</span>
+    ├── agents/         <span class="cmt"># Role separation</span>
+    ├── skills/         <span class="cmt"># Reusable knowledge</span>
+    └── hooks/          <span class="cmt"># Auto format/validate/notify</span></code>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 73: Adoption Order -->
+<section class="slide content-slide" data-slide="72">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">A.15</p>
+        <h2 class="reveal">Adoption Order</h2>
+        <p class="reveal" style="margin-top:clamp(0.3rem,0.6vw,0.5rem);">Adopting everything at once is overkill. Go step by step:</p>
+        <div class="flow reveal" style="margin-top:clamp(0.5rem,1vw,0.8rem);">
+            <span class="flow-item" style="background:var(--accent);color:#fff;">CLAUDE.md</span><span class="flow-arrow">→</span>
+            <span class="flow-item">settings.json</span><span class="flow-arrow">→</span>
+            <span class="flow-item">commands</span><span class="flow-arrow">→</span>
+            <span class="flow-item">agents</span><span class="flow-arrow">→</span>
+            <span class="flow-item">skills</span><span class="flow-arrow">→</span>
+            <span class="flow-item">hooks</span>
+        </div>
+    </div>
+</section>
+
+
+<!-- SLIDE 74: Final Conclusion -->
+<section class="slide content-slide" data-slide="73">
+    <div class="grid-bg"></div>
+    <div class="accent-block-small"></div>
+    <div class="slide-content">
+        <p class="label reveal">A.16</p>
+        <h2 class="reveal">The Most Practical Takeaways</h2>
+        <ol class="reveal" style="padding-left:1.5em; margin-top:clamp(0.5rem,1vw,0.8rem); list-style:decimal;">
+            <li><code>.claude</code> is not just a config folder — it's the <strong>Claude Code operating layer</strong>.</li>
+            <li>Command, agent, and skill are not interchangeable — they are <strong>components with different roles</strong>.</li>
+            <li>Good setup = short memory + modular rules + reusable skills + constrained agents + event-driven hooks</li>
+            <li><strong>Separating team-shared assets from personal assets</strong> is key to long-term sustainability.</li>
+            <li><strong>Context budget and permission management must be solved structurally</strong> for stable operation.</li>
+        </ol>
+    </div>
+</section>
+
+
+<!-- ====================================================
+     SLIDE 75: CLOSING
+     ==================================================== -->
+<section class="slide section-slide" data-slide="74">
+    <div class="grid-bg-dark"></div>
+    <div class="slide-content" style="align-items:center; text-align:center;">
+        <p class="label reveal" style="color:var(--accent-light);">Thank You</p>
+        <h1 class="reveal" style="color:#fff;">AI Coding Agent<br>Complete Setup Guide</h1>
+        <p class="subtitle reveal" style="color:rgba(255,255,255,0.5); margin-top:1rem;">Claude Code · Codex · gstack · Ralph</p>
+        <div class="reveal" style="margin-top:clamp(1.5rem,3vw,2.5rem); font-size:var(--small-size); color:rgba(255,255,255,0.4); line-height:1.7;">
+            <strong style="color:rgba(255,255,255,0.7);">Brant Hwang</strong> · brant@querypie.com<br>
+            Founder & CEO at QueryPie AI · <span style="color:var(--accent-light);">www.querypie.com</span>
+        </div>
+    </div>
+</section>
+
+
+<!-- ====================================================
+     JAVASCRIPT: Presentation Controller
+     ==================================================== -->
+<script>
+class SlidePresentation {
+    constructor() {
+        this.slides = document.querySelectorAll('.slide');
+        this.currentSlide = 0;
+        this.isScrolling = false;
+        this.slides[0].classList.add('visible');
+        this.setupKeyboardNav();
+        this.setupTouchNav();
+        this.setupWheelNav();
+        this.setupProgressBar();
+        this.setupNavDots();
+    }
+
+    goToSlide(index) {
+        if (index < 0 || index >= this.slides.length) return;
+        this.slides[this.currentSlide].classList.remove('visible');
+        this.currentSlide = index;
+        document.body.style.transform = `translateX(-${index * 100}vw)`;
+        this.slides[index].classList.add('visible');
+        this.updateProgressBar();
+        this.updateNavDots();
+        this.updateSlideCounter();
+        this.updateHash();
+    }
+
+    setupKeyboardNav() {
+        document.addEventListener('keydown', (e) => {
+            if (e.target.getAttribute('contenteditable') === 'true') return;
+            switch(e.key) {
+                case 'ArrowRight': case 'ArrowDown': case ' ': case 'PageDown':
+                    e.preventDefault(); this.goToSlide(this.currentSlide + 1); break;
+                case 'ArrowLeft': case 'ArrowUp': case 'PageUp':
+                    e.preventDefault(); this.goToSlide(this.currentSlide - 1); break;
+                case 'Home': e.preventDefault(); this.goToSlide(0); break;
+                case 'End': e.preventDefault(); this.goToSlide(this.slides.length - 1); break;
+            }
+        });
+    }
+
+    setupTouchNav() {
+        let startX = 0;
+        document.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
+        document.addEventListener('touchend', e => {
+            const diff = startX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) {
+                diff > 0 ? this.goToSlide(this.currentSlide + 1) : this.goToSlide(this.currentSlide - 1);
+            }
+        }, { passive: true });
+    }
+
+    setupWheelNav() {
+        let accumulated = 0;
+        let timeout;
+        document.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            if (this.isScrolling) return;
+            const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+            accumulated += delta;
+            clearTimeout(timeout);
+            timeout = setTimeout(() => { accumulated = 0; }, 200);
+            if (Math.abs(accumulated) > 50) {
+                this.isScrolling = true;
+                accumulated > 0 ? this.goToSlide(this.currentSlide + 1) : this.goToSlide(this.currentSlide - 1);
+                accumulated = 0;
+                setTimeout(() => { this.isScrolling = false; }, 300);
+            }
+        }, { passive: false });
+    }
+
+    setupProgressBar() {
+        this.progressBar = document.getElementById('progressBar');
+        this.updateProgressBar();
+    }
+
+    updateProgressBar() {
+        if (!this.progressBar) return;
+        const pct = ((this.currentSlide + 1) / this.slides.length) * 100;
+        this.progressBar.style.width = pct + '%';
+    }
+
+    setupNavDots() {
+        const nav = document.getElementById('navDots');
+        if (!nav) return;
+        this.slides.forEach((_, i) => {
+            const dot = document.createElement('button');
+            dot.className = 'nav-dot' + (i === 0 ? ' active' : '');
+            dot.setAttribute('aria-label', `Slide ${i + 1}`);
+            dot.addEventListener('click', () => this.goToSlide(i));
+            nav.appendChild(dot);
+        });
+        this.dots = nav.querySelectorAll('.nav-dot');
+    }
+
+    updateNavDots() {
+        if (!this.dots) return;
+        this.dots.forEach((d, i) => d.classList.toggle('active', i === this.currentSlide));
+    }
+
+    updateSlideCounter() {
+        const el = document.getElementById('slideCounter');
+        if (el) el.textContent = `${this.currentSlide + 1} / ${this.slides.length}`;
+    }
+
+    updateHash() {
+        history.replaceState(null, '', '#' + (this.currentSlide + 1));
+    }
+
+    loadFromHash() {
+        const hash = parseInt(location.hash.replace('#', ''), 10);
+        if (hash > 0 && hash <= this.slides.length) {
+            this.slides[this.currentSlide].classList.remove('visible');
+            this.currentSlide = hash - 1;
+            document.body.style.transform = `translateX(-${(hash - 1) * 100}vw)`;
+            this.slides[hash - 1].classList.add('visible');
+            this.updateProgressBar();
+            this.updateNavDots();
+            this.updateSlideCounter();
+        }
+    }
+}
+
+/* === INLINE EDITOR === */
+class InlineEditor {
+    constructor() {
+        this.isActive = false;
+        this.storageKey = 'slides-edit-' + location.pathname;
+        this.loadEdits();
+    }
+
+    toggleEditMode() {
+        this.isActive = !this.isActive;
+        const toggle = document.getElementById('editToggle');
+        const banner = document.getElementById('editBanner');
+        toggle.classList.toggle('active', this.isActive);
+        banner.classList.toggle('show', this.isActive);
+
+        document.querySelectorAll('h1, h2, h3, p, li, code, span').forEach(el => {
+            if (el.closest('.nav-dots') || el.closest('.edit-banner') || el.closest('.edit-toggle')) return;
+            el.contentEditable = this.isActive ? 'true' : 'false';
+        });
+    }
+
+    saveEdits() {
+        const data = {};
+        document.querySelectorAll('.slide').forEach((slide, i) => {
+            data[i] = slide.innerHTML;
+        });
+        localStorage.setItem(this.storageKey, JSON.stringify(data));
+    }
+
+    loadEdits() {
+        const raw = localStorage.getItem(this.storageKey);
+        if (!raw) return;
+        try {
+            const data = JSON.parse(raw);
+            document.querySelectorAll('.slide').forEach((slide, i) => {
+                if (data[i]) slide.innerHTML = data[i];
+            });
+        } catch(e) {}
+    }
+
+    exportFile() {
+        const html = document.documentElement.outerHTML;
+        const blob = new Blob([html], { type: 'text/html' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'presentation-edited.html';
+        a.click();
+    }
+}
+
+/* Init */
+const presentation = new SlidePresentation();
+presentation.loadFromHash();
+
+function navigateToId(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const idx = [...presentation.slides].indexOf(el);
+    if (idx !== -1) presentation.goToSlide(idx);
+}
+window.addEventListener('hashchange', () => presentation.loadFromHash());
+const editor = new InlineEditor();
+
+/* Edit toggle hover & keyboard */
+const hotzone = document.getElementById('editHotzone');
+const editToggle = document.getElementById('editToggle');
+let hideTimeout = null;
+
+hotzone.addEventListener('mouseenter', () => { clearTimeout(hideTimeout); editToggle.classList.add('show'); });
+hotzone.addEventListener('mouseleave', () => { hideTimeout = setTimeout(() => { if (!editor.isActive) editToggle.classList.remove('show'); }, 400); });
+editToggle.addEventListener('mouseenter', () => { clearTimeout(hideTimeout); });
+editToggle.addEventListener('mouseleave', () => { hideTimeout = setTimeout(() => { if (!editor.isActive) editToggle.classList.remove('show'); }, 400); });
+editToggle.addEventListener('click', () => { editor.toggleEditMode(); });
+hotzone.addEventListener('click', () => { editor.toggleEditMode(); });
+
+document.addEventListener('keydown', (e) => {
+    if ((e.key === 'e' || e.key === 'E') && !e.target.getAttribute('contenteditable')) {
+        editor.toggleEditMode();
+    }
+    if (e.ctrlKey && e.key === 's') {
+        e.preventDefault();
+        editor.saveEdits();
+    }
+});
+</script>
+
+</body>
+</html>
