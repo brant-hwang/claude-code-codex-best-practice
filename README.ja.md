@@ -39,4 +39,4 @@
 
 ---
 
-**制作: [Brant Hwang](mailto:brant@querypie.com)** — [QueryPie](https://www.querypie.com) CEO
+**制作: [Brant Hwang](mailto:brant@querypie.com)** — [QueryPie AI](https://www.querypie.com) CEO

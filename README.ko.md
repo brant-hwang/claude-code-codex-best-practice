@@ -39,4 +39,4 @@
 
 ---
 
-**제작: [Brant Hwang](mailto:brant@querypie.com)** — [QueryPie](https://www.querypie.com) 대표
+**제작: [Brant Hwang](mailto:brant@querypie.com)** — [QueryPie AI](https://www.querypie.com) 대표

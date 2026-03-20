@@ -39,4 +39,4 @@ The guide is a slide-based presentation. Navigate with:
 
 ---
 
-**Built by [Brant Hwang](mailto:brant@querypie.com)** — Founder & CEO at [QueryPie](https://www.querypie.com)
+**Built by [Brant Hwang](mailto:brant@querypie.com)** — Founder & CEO at [QueryPie AI](https://www.querypie.com)
